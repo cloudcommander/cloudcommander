@@ -1,0 +1,5 @@
+#Idea files
+/.idea
+
+#Gradle wrapper
+/.gradle
