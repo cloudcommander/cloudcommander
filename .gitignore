@@ -3,3 +3,9 @@
 
 #Gradle wrapper
 /.gradle
+
+#Build folders
+/custom/applications/*/build
+/custom/modules/*/build
+
+/vendor/*/build
