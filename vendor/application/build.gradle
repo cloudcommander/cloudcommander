@@ -1,2 +1,6 @@
 group 'com.cloudcommander.vendor.application'
 version '1.0-SNAPSHOT'
+
+dependencies{
+    compile project(':vendor:module')
+}
