@@ -1,4 +1,8 @@
 group 'com.cloudcommander.custom.applications.standalone'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+
+dependencies{
+    compile project(':vendor:application')
+}

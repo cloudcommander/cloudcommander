@@ -1,3 +1,4 @@
 rootProject.name = 'cloudcommander-parent'
 
-include ':custom:applications:standalone'
+include ':custom:applications:standalone',
+        ':vendor:application'

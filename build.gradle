@@ -3,12 +3,16 @@ version '1.0-SNAPSHOT'
 
 subprojects{
     buildscript {
-        dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
-        }
         repositories {
             mavenCentral()
         }
+        dependencies {
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
+        }
+    }
+
+    repositories {
+        mavenCentral()
     }
 
     apply plugin: 'java'
@@ -20,3 +24,5 @@ subprojects{
 //Avoid generating the build folder on non module-folders
 project(':custom').jar { onlyIf { false } }
 project(':custom:applications').jar { onlyIf { false } }
+
+project(':vendor').jar { onlyIf { false } }
