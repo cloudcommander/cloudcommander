@@ -1,2 +1,4 @@
 group 'com.cloudcommander.custom.applications.standalone'
 version '1.0-SNAPSHOT'
+
+apply plugin: 'spring-boot'

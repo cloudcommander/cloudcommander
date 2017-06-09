@@ -2,6 +2,15 @@ group 'com.cloudcommander'
 version '1.0-SNAPSHOT'
 
 subprojects{
+    buildscript {
+        dependencies {
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
+        }
+        repositories {
+            mavenCentral()
+        }
+    }
+
     apply plugin: 'java'
 
     sourceCompatibility = 1.8
