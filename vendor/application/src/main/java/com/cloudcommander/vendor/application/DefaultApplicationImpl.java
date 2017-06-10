@@ -11,6 +11,8 @@ import com.cloudcommander.vendor.module.validators.DefaultModuleValidatorImpl;
 import com.cloudcommander.vendor.module.validators.ModuleCollectionValidator;
 import com.cloudcommander.vendor.module.validators.ModuleValidator;
 import com.cloudcommander.vendor.module.validators.exceptions.ValidationFailedException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +21,8 @@ import java.util.List;
  * Created by Adrian Tello on 09/06/2017.
  */
 public class DefaultApplicationImpl implements Application{
+
+    private final static Logger LOG = LogManager.getLogger(DefaultApplicationImpl.class);
 
     @Override
     public void start(String[] args) throws ApplicationStartException {
@@ -52,12 +56,15 @@ public class DefaultApplicationImpl implements Application{
     }
 
     protected void logApplicationTrailer(final Collection<Module> sortedModules) {
-        System.out.println("========================================================");
-        System.out.println("Starting system:");
-        System.out.println("========================================================");
-        System.out.println("Active modules:");
-        for(Module module: sortedModules){
-            System.out.println(module.getName());
+        if(LOG.isInfoEnabled()){
+            LOG.info("========================================================");
+            LOG.info("Starting system:");
+            LOG.info("========================================================");
+            LOG.info("Active modules:");
+            for(Module module: sortedModules){
+                LOG.info(module.getName());
+            }
+            LOG.info("========================================================");
         }
     }
 }

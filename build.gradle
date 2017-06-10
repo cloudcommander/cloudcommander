@@ -19,6 +19,11 @@ subprojects{
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    dependencies{
+        compile('org.apache.logging.log4j:log4j-core:2.6.2')
+        compile('org.apache.logging.log4j:log4j-jcl:2.6.2')
+    }
 }
 
 //Avoid generating the build folder on non module-folders
