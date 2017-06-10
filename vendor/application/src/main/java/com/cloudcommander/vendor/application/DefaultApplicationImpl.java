@@ -4,6 +4,8 @@ import com.cloudcommander.vendor.application.exceptions.ApplicationStartExceptio
 import com.cloudcommander.vendor.module.loader.DefaultModuleLoaderImpl;
 import com.cloudcommander.vendor.module.loader.ModuleLoader;
 import com.cloudcommander.vendor.module.modules.Module;
+import com.cloudcommander.vendor.module.printer.DefaultModulePrinterImpl;
+import com.cloudcommander.vendor.module.printer.ModulePrinter;
 import com.cloudcommander.vendor.module.sorter.DefaultModuleSorterImpl;
 import com.cloudcommander.vendor.module.sorter.ModuleSorter;
 import com.cloudcommander.vendor.module.validators.DefaultModuleCollectionValidatorImpl;
@@ -14,6 +16,10 @@ import com.cloudcommander.vendor.module.validators.exceptions.ValidationFailedEx
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,13 +35,12 @@ public class DefaultApplicationImpl implements Application{
         final Collection<Module> modules = getAvailableModules();
         try {
             validateModules(modules);
-        } catch (ValidationFailedException e) {
+            final List<Module> sortedModules = sortModules(modules); //Modules sorted by loading order
+
+            logApplicationTrailer(sortedModules);
+        } catch (ValidationFailedException | IOException e) {
             throw new ApplicationStartException(e);
         }
-
-        final Collection<Module> sortedModules = sortModules(modules); //Modules sorted by loading order
-
-        logApplicationTrailer(sortedModules);
     }
 
     private void validateModules(final Collection<Module> modules) throws ValidationFailedException {
@@ -55,16 +60,21 @@ public class DefaultApplicationImpl implements Application{
         return moduleSorter.sort(modules);
     }
 
-    protected void logApplicationTrailer(final Collection<Module> sortedModules) {
+    protected void logApplicationTrailer(final List<Module> sortedModules) throws IOException {
         if(LOG.isInfoEnabled()){
-            LOG.info("========================================================");
-            LOG.info("Starting system:");
-            LOG.info("========================================================");
-            LOG.info("Active modules:");
-            for(Module module: sortedModules){
-                LOG.info(module.getName());
+            ModulePrinter modulePrinter = new DefaultModulePrinterImpl();
+
+            try(OutputStream modulesOutputStream = new ByteArrayOutputStream();
+                    PrintStream modulesPrintStream = new PrintStream(modulesOutputStream);){
+                modulePrinter.print(sortedModules, modulesPrintStream);
+
+                LOG.info("========================================================");
+                LOG.info("Starting system:");
+                LOG.info("========================================================");
+                LOG.info("Active modules:");
+                LOG.info(modulesOutputStream);
+                LOG.info("========================================================");
             }
-            LOG.info("========================================================");
         }
     }
 }
