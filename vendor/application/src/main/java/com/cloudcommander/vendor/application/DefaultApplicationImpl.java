@@ -15,6 +15,7 @@ import com.cloudcommander.vendor.module.validators.ModuleValidator;
 import com.cloudcommander.vendor.module.validators.exceptions.ValidationFailedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.boot.SpringApplication;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Adrian Tello on 09/06/2017.
@@ -38,12 +40,14 @@ public class DefaultApplicationImpl implements Application{
             final List<Module> sortedModules = sortModules(modules); //Modules sorted by loading order
 
             logApplicationTrailer(sortedModules);
+
+            startSpringFramework(sortedModules, args);
         } catch (ValidationFailedException | IOException e) {
             throw new ApplicationStartException(e);
         }
     }
 
-    private void validateModules(final Collection<Module> modules) throws ValidationFailedException {
+    protected void validateModules(final Collection<Module> modules) throws ValidationFailedException {
         final ModuleValidator moduleValidator = new DefaultModuleValidatorImpl();
         final ModuleCollectionValidator moduleCollectionValidator = new DefaultModuleCollectionValidatorImpl(moduleValidator);
 
@@ -76,5 +80,15 @@ public class DefaultApplicationImpl implements Application{
                 LOG.info("========================================================");
             }
         }
+    }
+
+    protected Class[] getSpringConfigurations(final List<Module> modules)
+    {
+        return modules.stream().map(Module::getSpringConfigClass).filter(Optional::isPresent).map(Optional::get).toArray(Class[]::new);
+    }
+
+    protected void startSpringFramework(final List<Module> sortedModules, final String[] args) {
+        final Class[] springConfigs = getSpringConfigurations(sortedModules);
+        SpringApplication.run(springConfigs, args);
     }
 }

@@ -1,6 +1,10 @@
 group 'com.cloudcommander.vendor.application'
 version '1.0-SNAPSHOT'
 
+apply plugin: 'org.springframework.boot'
+
 dependencies{
     compile project(':vendor:module')
+
+    compile("org.springframework.boot:spring-boot-starter")
 }
