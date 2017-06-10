@@ -6,6 +6,11 @@ import com.cloudcommander.vendor.module.loader.ModuleLoader;
 import com.cloudcommander.vendor.module.modules.Module;
 import com.cloudcommander.vendor.module.sorter.DefaultModuleSorterImpl;
 import com.cloudcommander.vendor.module.sorter.ModuleSorter;
+import com.cloudcommander.vendor.module.validators.DefaultModuleCollectionValidatorImpl;
+import com.cloudcommander.vendor.module.validators.DefaultModuleValidatorImpl;
+import com.cloudcommander.vendor.module.validators.ModuleCollectionValidator;
+import com.cloudcommander.vendor.module.validators.ModuleValidator;
+import com.cloudcommander.vendor.module.validators.exceptions.ValidationFailedException;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,9 +23,22 @@ public class DefaultApplicationImpl implements Application{
     @Override
     public void start(String[] args) throws ApplicationStartException {
         final Collection<Module> modules = getAvailableModules();
+        try {
+            validateModules(modules);
+        } catch (ValidationFailedException e) {
+            throw new ApplicationStartException(e);
+        }
+
         final Collection<Module> sortedModules = sortModules(modules); //Modules sorted by loading order
 
         logApplicationTrailer(sortedModules);
+    }
+
+    private void validateModules(final Collection<Module> modules) throws ValidationFailedException {
+        final ModuleValidator moduleValidator = new DefaultModuleValidatorImpl();
+        final ModuleCollectionValidator moduleCollectionValidator = new DefaultModuleCollectionValidatorImpl(moduleValidator);
+
+        moduleCollectionValidator.validate(modules);
     }
 
     protected Collection<Module> getAvailableModules(){
