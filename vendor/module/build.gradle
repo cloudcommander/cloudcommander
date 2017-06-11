@@ -1,8 +1,15 @@
 group 'com.cloudcommander.vendor.module'
 version '1.0-SNAPSHOT'
 
+apply plugin: 'org.springframework.boot'
+
 dependencies{
     compile 'com.google.guava:guava:22.0'
+    compile("org.springframework.boot:spring-boot-starter")
 
     testCompile 'junit:junit:4.12'
+}
+
+bootRepackage {
+    enabled = false
 }

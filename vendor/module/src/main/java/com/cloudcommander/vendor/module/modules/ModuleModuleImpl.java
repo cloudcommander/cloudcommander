@@ -1,5 +1,7 @@
 package com.cloudcommander.vendor.module.modules;
 
+import com.cloudcommander.vendor.module.ModuleConfiguration;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -11,6 +13,6 @@ public class ModuleModuleImpl extends DefaultModuleImpl{
     private final static String MODULE_NAME = "module";
 
     public ModuleModuleImpl() {
-        super(MODULE_NAME, Collections.emptyList());
+        super(MODULE_NAME, Collections.emptyList(), ModuleConfiguration.class);
     }
 }

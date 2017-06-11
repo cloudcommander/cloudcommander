@@ -16,6 +16,7 @@ import com.cloudcommander.vendor.module.validators.exceptions.ValidationFailedEx
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -89,6 +90,11 @@ public class DefaultApplicationImpl implements Application{
 
     protected void startSpringFramework(final List<Module> sortedModules, final String[] args) {
         final Class[] springConfigs = getSpringConfigurations(sortedModules);
-        SpringApplication.run(springConfigs, args);
+
+        final SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder();
+        springApplicationBuilder.sources(springConfigs);
+
+        final SpringApplication springApplication = springApplicationBuilder.build();
+        springApplication.run(args);
     }
 }

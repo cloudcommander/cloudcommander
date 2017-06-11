@@ -8,3 +8,7 @@ dependencies{
 
     compile("org.springframework.boot:spring-boot-starter")
 }
+
+bootRepackage {
+    enabled = false
+}
