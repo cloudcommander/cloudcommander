@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * Created by Adrian Tello on 09/06/2017.
@@ -77,7 +78,11 @@ public class DefaultApplicationImpl implements Application{
                 LOG.info("Starting system:");
                 LOG.info("========================================================");
                 LOG.info("Active modules:");
-                LOG.info(modulesOutputStream);
+                Scanner modulesPrintStreamScanner = new Scanner(modulesOutputStream.toString());
+                while(modulesPrintStreamScanner.hasNextLine()){
+                    LOG.info(modulesPrintStreamScanner.nextLine());
+                }
+
                 LOG.info("========================================================");
             }
         }
