@@ -1,5 +1,6 @@
 package com.cloudcommander.vendor.application.modules;
 
+import com.cloudcommander.vendor.application.ApplicationConfiguration;
 import com.cloudcommander.vendor.module.modules.DefaultModuleImpl;
 
 import java.util.Arrays;
@@ -15,6 +16,6 @@ public class ApplicationModuleImpl extends DefaultModuleImpl{
     private final static Collection<String> REQUIRED_MODULES = Arrays.asList("module");
 
     public ApplicationModuleImpl() {
-        super(MODULE_NAME, REQUIRED_MODULES);
+        super(MODULE_NAME, REQUIRED_MODULES, ApplicationConfiguration.class);
     }
 }
