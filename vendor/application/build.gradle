@@ -1,14 +1,8 @@
 group 'com.cloudcommander.vendor.application'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'org.springframework.boot'
+apply plugin: 'com.cloudcommander.module'
 
 dependencies{
     compile project(':vendor:module')
-
-    compile("org.springframework.boot:spring-boot-starter")
-}
-
-bootRepackage {
-    enabled = false
 }

@@ -1,4 +1,4 @@
-package com.cloudcommander.module.plugins
+package com.cloudcommander.gradle.plugins.module
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,9 +16,9 @@ class ModulePlugin implements Plugin<Project> {
 
     private void doApply(final Project project){
         project.apply plugin: 'java'
+        project.apply plugin: 'idea'
+        project.apply plugin: 'eclipse'
         project.apply plugin: 'org.springframework.boot'
-
-        project.extensions.add("com.cloudcommander.module", ModulePluginExtension)
 
         project.task("generate-cc-module", type: CCModuleTask) {
             group = "CloudCommanderModulePlugin"
@@ -26,6 +26,9 @@ class ModulePlugin implements Plugin<Project> {
         }
 
         project.tasks.compileJava.dependsOn("generate-cc-module")
+
+        project.sourceSets.main.java.srcDir(project.tasks['generate-cc-module'].javaDir)
+        project.sourceSets.main.resources.srcDir(project.tasks['generate-cc-module'].resourcesDir)
 
         project.tasks.bootRepackage.enabled = false;
 

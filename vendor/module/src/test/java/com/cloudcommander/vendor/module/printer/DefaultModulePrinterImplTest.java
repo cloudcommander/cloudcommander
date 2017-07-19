@@ -17,6 +17,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class DefaultModulePrinterImplTest {
 
+    private static final String NEW_LINE = System.getProperty("line.separator").toString();
+
     private final ModulePrinter modulePrinter = new DefaultModulePrinterImpl();
 
     private ByteArrayOutputStream byteArrayOutputStream;
@@ -47,7 +49,7 @@ public class DefaultModulePrinterImplTest {
         modulePrinter.print(Collections.singletonList(module), printStream);
 
         //Verify
-        assertEquals("Module [modname]. Dependencies: []\r\n", byteArrayOutputStream.toString());
+        assertEquals("Module [modname]. Dependencies: []" + NEW_LINE, byteArrayOutputStream.toString());
     }
 
     @Test
@@ -59,7 +61,7 @@ public class DefaultModulePrinterImplTest {
         modulePrinter.print(Collections.singletonList(module), printStream);
 
         //Verify
-        assertEquals("Module [modname]. Dependencies: [dep1, core]\r\n", byteArrayOutputStream.toString());
+        assertEquals("Module [modname]. Dependencies: [dep1, core]" + NEW_LINE, byteArrayOutputStream.toString());
     }
 
     @Test
@@ -73,8 +75,8 @@ public class DefaultModulePrinterImplTest {
         modulePrinter.print(Arrays.asList(module1, module2, module3), printStream);
 
         //Verify
-        assertEquals("Module [modname1]. Dependencies: [dep1, core]\r\n" +
-                "Module [modname2]. Dependencies: [modname1, modname3]\r\n" +
-                "Module [modname3]. Dependencies: []\r\n", byteArrayOutputStream.toString());
+        assertEquals("Module [modname1]. Dependencies: [dep1, core]" + NEW_LINE +
+                "Module [modname2]. Dependencies: [modname1, modname3]" + NEW_LINE +
+                "Module [modname3]. Dependencies: []" + NEW_LINE, byteArrayOutputStream.toString());
     }
 }

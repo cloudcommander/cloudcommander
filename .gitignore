@@ -3,8 +3,11 @@
 
 #Gradle wrapper
 /.gradle
+/buildSrc/.gradle
 
 #Build folders
+/buildSrc/build
+/build
 /custom/applications/*/build
 /custom/modules/*/build
 
