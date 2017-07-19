@@ -5,5 +5,4 @@ apply plugin: 'com.cloudcommander.module'
 
 dependencies{
     compile project(':vendor:module')
-    compile project(':vendor:cqrs')
 }
