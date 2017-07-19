@@ -1,0 +1,8 @@
+group 'com.cloudcommander.vendor.application'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.cloudcommander.module'
+
+dependencies{
+    compile project(':vendor:module')
+}
