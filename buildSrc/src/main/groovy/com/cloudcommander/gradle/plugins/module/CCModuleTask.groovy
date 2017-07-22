@@ -6,6 +6,8 @@ import org.gradle.api.tasks.TaskAction
 import com.squareup.javapoet.*
 import javax.lang.model.element.Modifier
 import org.apache.commons.text.WordUtils;
+import org.gradle.api.artifacts.ProjectDependency;
+import org.gradle.api.plugins.UnknownPluginException;
 
 class CCModuleTask extends DefaultTask {
 
@@ -25,6 +27,31 @@ class CCModuleTask extends DefaultTask {
         generateModuleFile();
         generateConfigurationFile();
         generateModuleServicesFile();
+    }
+
+    def getAllDependentProjects(project) {
+        def projectDependencies = project.configurations.runtime.getAllDependencies().withType(ProjectDependency)
+        def dependentProjects = projectDependencies*.dependencyProject
+        if (dependentProjects.size > 0) {
+            dependentProjects.each { dependentProjects += getAllDependentProjects(it) }
+        }
+        return dependentProjects.unique()
+    }
+
+    def getAllDependentModules(){
+        return getAllDependentProjects(project).findAll{project ->
+            try{
+                project.plugins["com.cloudcommander.module"];
+                return true;
+            }catch(UnknownPluginException e){
+                //Unknown plugin
+                return false;
+            }
+        };
+    }
+
+    def getAllDependentModuleNames(){
+        return getAllDependentModules().collect { it.name }
     }
 
     private void generateModuleFile(){
