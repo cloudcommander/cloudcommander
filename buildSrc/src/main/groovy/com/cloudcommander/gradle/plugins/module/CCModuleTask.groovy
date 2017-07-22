@@ -4,6 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import com.squareup.javapoet.*
+import java.util.Arrays;
 import javax.lang.model.element.Modifier
 import org.apache.commons.text.WordUtils;
 import org.gradle.api.artifacts.ProjectDependency;
@@ -55,10 +56,23 @@ class CCModuleTask extends DefaultTask {
     }
 
     private void generateModuleFile(){
+    	List<String> dependencyNames = getAllDependentModuleNames();
+    
+    	StringBuilder dependencyStringBuilder = new StringBuilder();
+    	dependencyNames.each({
+    		if(dependencyStringBuilder.length() != 0){
+    			dependencyStringBuilder.append(',');
+    		}
+    	
+    		dependencyStringBuilder.append('"');
+    		dependencyStringBuilder.append(it);
+    		dependencyStringBuilder.append('"');
+    	});
+    
         MethodSpec constrMethodSpec = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addStatement('super($S, $T.emptyList(), $T.class)', project.name, Collections.class, ClassName.get(project.group, getConfigurationClassName()))
-                .build();
+                .addCode('super("' + project.name + '", java.util.Arrays.asList(' + dependencyStringBuilder.toString() + '), ' + project.group + '.' + getConfigurationClassName() + '.class);')
+			    .build();
 
         String className = getClassPrefix() + "ModuleImpl";
         TypeSpec classSpec = TypeSpec.classBuilder(className)
