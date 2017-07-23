@@ -1,6 +1,13 @@
 #Idea files
 /.idea
 
+#Eclipse files
+.classpath
+.settings
+.project
+.gitignore
+!/.gitignore
+
 #Gradle wrapper
 /.gradle
 /buildSrc/.gradle
