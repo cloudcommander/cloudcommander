@@ -1,8 +1,9 @@
-group 'com.cloudcommander.vendor.application'
+group 'com.cloudcommander.vendor.cqrs'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'com.cloudcommander.module'
 
 dependencies{
+    compile project(':vendor:kafka')
     compile project(':vendor:module')
 }
