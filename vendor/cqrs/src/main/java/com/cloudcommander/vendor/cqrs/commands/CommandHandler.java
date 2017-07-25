@@ -1,6 +1,6 @@
-package com.cloudcommander.vendor.cqrs.aggregate;
+package com.cloudcommander.vendor.cqrs.commands;
 
-import io.reactivex.Single;
+import com.cloudcommander.vendor.cqrs.events.Event;
 
 import java.util.List;
 import java.util.Optional;

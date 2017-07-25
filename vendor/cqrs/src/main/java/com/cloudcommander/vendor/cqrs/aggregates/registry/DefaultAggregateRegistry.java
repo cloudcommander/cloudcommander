@@ -1,6 +1,6 @@
-package com.cloudcommander.vendor.cqrs.aggregate.registry;
+package com.cloudcommander.vendor.cqrs.aggregates.registry;
 
-import com.cloudcommander.vendor.cqrs.aggregate.AggregateConfig;
+import com.cloudcommander.vendor.cqrs.aggregates.AggregateConfig;
 import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
