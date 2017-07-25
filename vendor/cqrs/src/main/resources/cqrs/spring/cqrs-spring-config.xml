@@ -5,4 +5,7 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="aggregateConfig" abstract="true" class="com.cloudcommander.vendor.cqrs.aggregate.AggregateConfig"/>
+
+    <alias name="defaultAggregateRegistry" alias="aggregateRegistry"/>
+    <bean id="defaultAggregateRegistry" class="com.cloudcommander.vendor.cqrs.aggregate.registry.DefaultAggregateRegistry"/>
 </beans>
