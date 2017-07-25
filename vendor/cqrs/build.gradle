@@ -6,4 +6,6 @@ apply plugin: 'com.cloudcommander.module'
 dependencies{
     compile project(':vendor:kafka')
     compile project(':vendor:module')
+    compile "io.reactivex.rxjava2:rxjava:2.1.2"
+    compileOnly 'org.projectlombok:lombok:1.16.18'
 }
