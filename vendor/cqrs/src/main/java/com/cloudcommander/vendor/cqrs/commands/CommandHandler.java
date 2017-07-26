@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CommandHandler<T,S> {
     List<Event> handle(T command, Optional<S> currentStateOptional);
+
+    Class<T> getCommandClass();
 }

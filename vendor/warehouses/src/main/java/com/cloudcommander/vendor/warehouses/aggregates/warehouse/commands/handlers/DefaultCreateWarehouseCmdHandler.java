@@ -38,4 +38,9 @@ public class DefaultCreateWarehouseCmdHandler implements CreateWarehouseCmdHandl
 
         return Collections.singletonList(event);
     }
+
+    @Override
+    public Class<CreateWarehouseCmd> getCommandClass() {
+        return CreateWarehouseCmd.class;
+    }
 }

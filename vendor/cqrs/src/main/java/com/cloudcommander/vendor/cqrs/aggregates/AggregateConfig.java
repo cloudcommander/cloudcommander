@@ -6,6 +6,7 @@ import com.cloudcommander.vendor.cqrs.events.EventHandler;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.List;
 import java.util.Map;
 
 @Value
@@ -15,8 +16,8 @@ public class AggregateConfig {
     Class<AggregateState> aggregateStateClass;
 
     @NonNull
-    Map<Class<Command>, CommandHandler> commandHandlerMap;
+    List<CommandHandler> commandHandlers;
 
     @NonNull
-    Map<Class<Command>, EventHandler> eventHandlerMap;
+    List<EventHandler> eventHandlerMap;
 }

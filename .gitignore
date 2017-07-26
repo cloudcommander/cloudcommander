@@ -1,5 +1,9 @@
 #Idea files
 /.idea
+/custom/applications/*/out
+/custom/modules/*/out
+
+/vendor/*/out
 
 #Eclipse files
 .classpath

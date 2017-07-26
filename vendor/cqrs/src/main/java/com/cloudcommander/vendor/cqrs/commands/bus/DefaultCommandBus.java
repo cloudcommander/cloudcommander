@@ -57,11 +57,10 @@ public class DefaultCommandBus implements CommandBus{
         ImmutableMap.Builder<Class<Command>, CommandHandler> commandHandlerMapBuilder = ImmutableMap.builder();
         for(AggregateConfig aggregateConfig: aggregateConfigs){
 
-            Map<Class<Command>, CommandHandler> aggregateCommandHandlerMap = aggregateConfig.getCommandHandlerMap();
+            List<CommandHandler> aggregateCommandHandlers = aggregateConfig.getCommandHandlers();
 
-            for(Map.Entry<Class<Command>, CommandHandler> aggregateCommandHandlerEntry: aggregateCommandHandlerMap.entrySet()){
-                Class<Command> commandClass = aggregateCommandHandlerEntry.getKey();
-                CommandHandler commandHandler = aggregateCommandHandlerEntry.getValue();
+            for(CommandHandler commandHandler: aggregateCommandHandlers){
+                Class<Command> commandClass = commandHandler.getCommandClass();
 
                 commandHandlerMapBuilder.put(commandClass, commandHandler);
             }
