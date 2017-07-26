@@ -17,6 +17,11 @@ public class DefaultWarehouseCreatedEvtHandler implements WarehouseCreatedEvtHan
         return Optional.of(state);
     }
 
+    @Override
+    public Class<WarehouseCreatedEvt> getEventClass() {
+        return WarehouseCreatedEvt.class;
+    }
+
     protected WarehouseStateFactory getWarehouseStateFactory() {
         return warehouseStateFactory;
     }

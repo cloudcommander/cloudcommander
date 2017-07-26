@@ -7,18 +7,14 @@
     <bean id="defaultWarehouseAggregateConfig" parent="aggregateConfig">
         <constructor-arg value="com.cloudcommander.vendor.warehouses.aggregates.warehouse.WarehouseState"/>
         <constructor-arg>
-            <map>
-                <entry key="com.cloudcommander.vendor.warehouses.aggregates.warehouse.commands.CreateWarehouseCmd">
-                    <ref bean="createWarehouseCmdHandler"/>
-                </entry>
-            </map>
+            <list>
+                <ref bean="createWarehouseCmdHandler"/>
+            </list>
         </constructor-arg>
         <constructor-arg>
-            <map>
-                <entry key="com.cloudcommander.vendor.warehouses.aggregates.warehouse.events.WarehouseCreatedEvt">
-                    <ref bean="warehouseCreatedEvtHandler"/>
-                </entry>
-            </map>
+            <list>
+                <ref bean="warehouseCreatedEvtHandler"/>
+            </list>
         </constructor-arg>
     </bean>
 

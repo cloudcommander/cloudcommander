@@ -13,11 +13,11 @@ import java.util.Map;
 public class AggregateConfig {
 
     @NonNull
-    Class<AggregateState> aggregateStateClass;
+    Class<? extends AggregateState> aggregateStateClass;
 
     @NonNull
     List<CommandHandler> commandHandlers;
 
     @NonNull
-    List<EventHandler> eventHandlerMap;
+    List<EventHandler> eventHandlers;
 }
