@@ -10,7 +10,7 @@ import java.util.List;
 public class DefaultAggregateRegistry implements AggregateRegistry{
     private List<AggregateConfig> aggregateConfigs;
 
-    protected List<AggregateConfig> getAggregateConfigs() {
+    public List<AggregateConfig> getAggregateConfigs() {
         return aggregateConfigs;
     }
 
