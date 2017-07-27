@@ -5,7 +5,7 @@ import com.cloudcommander.vendor.cqrs.events.Event;
 
 import java.util.List;
 
-public interface CommandBus {
+public interface CommandBusDispatcher {
     void dispatchAndForget(Command command);
 
     List<Event> dispatch(Command command);

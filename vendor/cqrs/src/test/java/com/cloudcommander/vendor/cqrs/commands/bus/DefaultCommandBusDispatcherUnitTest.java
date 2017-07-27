@@ -17,17 +17,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(JUnit4.class)
-public class DefaultCommandBusUnitTest {
+public class DefaultCommandBusDispatcherUnitTest {
 
     @Test
     public void testNoAggregates(){
         //Prepare
-        DefaultCommandBus defaultCommandBus = new DefaultCommandBus();
+        DefaultCommandBusDispatcher commandBusDispatcher = new DefaultCommandBusDispatcher();
         MockAggregateRegistry aggregateRegistry = new MockAggregateRegistry(Collections.emptyList());
-        defaultCommandBus.setAggregateRegistry(aggregateRegistry);
+        commandBusDispatcher.setAggregateRegistry(aggregateRegistry);
 
         //Test
-        Map<Class<Command>, CommandHandler> commandHandlerMap = defaultCommandBus.getCommandHandlerMap();
+        Map<Class<? extends Command>, CommandHandler> commandHandlerMap = commandBusDispatcher.getCommandHandlerMap();
 
         //Verify
         assertTrue(commandHandlerMap.isEmpty());
@@ -60,11 +60,11 @@ public class DefaultCommandBusUnitTest {
         List<AggregateConfig> aggregateConfigs = Arrays.asList(aggregateConfig1, aggregateConfig2, aggregateConfig3);
         MockAggregateRegistry aggregateRegistry = new MockAggregateRegistry(aggregateConfigs);
 
-        DefaultCommandBus defaultCommandBus = new DefaultCommandBus();
-        defaultCommandBus.setAggregateRegistry(aggregateRegistry);
+        DefaultCommandBusDispatcher commandBusDispatcher = new DefaultCommandBusDispatcher();
+        commandBusDispatcher.setAggregateRegistry(aggregateRegistry);
 
         //Test
-        Map<Class<Command>, CommandHandler> commandHandlerMap = defaultCommandBus.getCommandHandlerMap();
+        Map<Class<? extends Command>, CommandHandler> commandHandlerMap = commandBusDispatcher.getCommandHandlerMap();
 
         //Verify
         assertEquals(3, commandHandlerMap.size());
@@ -82,7 +82,7 @@ public class DefaultCommandBusUnitTest {
 
         private List<AggregateConfig> aggregateConfigs;
 
-        public MockAggregateRegistry(List<AggregateConfig> aggregateConfigs){
+        private MockAggregateRegistry(List<AggregateConfig> aggregateConfigs){
             this.aggregateConfigs = aggregateConfigs;
         }
 

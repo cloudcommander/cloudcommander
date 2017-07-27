@@ -9,7 +9,7 @@
     <alias name="defaultAggregateRegistry" alias="aggregateRegistry"/>
     <bean id="defaultAggregateRegistry" class="com.cloudcommander.vendor.cqrs.aggregates.registry.DefaultAggregateRegistry"/>
 
-    <bean id="defaultCommandBus" class="com.cloudcommander.vendor.cqrs.commands.bus.DefaultCommandBus">
+    <bean id="defaultCommandBusDispatcher" class="com.cloudcommander.vendor.cqrs.commands.bus.DefaultCommandBusDispatcher">
         <property name="aggregateRegistry" ref="aggregateRegistry"/>
     </bean>
 </beans>

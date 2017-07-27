@@ -14,29 +14,29 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultCommandBus implements CommandBus{
+public class DefaultCommandBusDispatcher implements CommandBusDispatcher {
 
-    private final static Logger LOG = LogManager.getLogger(DefaultCommandBus.class);
+    private final static Logger LOG = LogManager.getLogger(DefaultCommandBusDispatcher.class);
 
-    protected Map<Class<Command>, CommandHandler> commandHandlerMap = Collections.emptyMap();
+    protected Map<Class<? extends Command>, CommandHandler> commandHandlerMap = Collections.emptyMap();
 
     private AggregateRegistry aggregateRegistry;
 
     @Override
     public void dispatchAndForget(Command command) {
-
+        //TODO tello implement
     }
 
     @Override
     public List<Event> dispatch(Command command) {
-        return null;
+        return null;//TODO tello implement
     }
 
-    protected Map<Class<Command>, CommandHandler> getCommandHandlerMap() {
+    protected Map<Class<? extends Command>, CommandHandler> getCommandHandlerMap() {
         return commandHandlerMap;
     }
 
-    protected void setCommandHandlerMap(Map<Class<Command>, CommandHandler> commandHandlerMap){
+    protected void setCommandHandlerMap(Map<Class<? extends Command>, CommandHandler> commandHandlerMap){
         this.commandHandlerMap = commandHandlerMap;
     }
 
@@ -54,19 +54,19 @@ public class DefaultCommandBus implements CommandBus{
     protected void updateCommandHandlerMap() {
         List<AggregateConfig> aggregateConfigs = aggregateRegistry.getAggregateConfigs();
 
-        ImmutableMap.Builder<Class<Command>, CommandHandler> commandHandlerMapBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<Class<? extends Command>, CommandHandler> commandHandlerMapBuilder = ImmutableMap.builder();
         for(AggregateConfig aggregateConfig: aggregateConfigs){
 
             List<CommandHandler> aggregateCommandHandlers = aggregateConfig.getCommandHandlers();
 
             for(CommandHandler commandHandler: aggregateCommandHandlers){
-                Class<Command> commandClass = commandHandler.getCommandClass();
+                Class<? extends Command> commandClass = commandHandler.getCommandClass();
 
                 commandHandlerMapBuilder.put(commandClass, commandHandler);
             }
         }
 
-        Map<Class<Command>, CommandHandler> commandHandlerMap = commandHandlerMapBuilder.build();
+        Map<Class<? extends Command>, CommandHandler> commandHandlerMap = commandHandlerMapBuilder.build();
         setCommandHandlerMap(commandHandlerMap);
     }
 }
