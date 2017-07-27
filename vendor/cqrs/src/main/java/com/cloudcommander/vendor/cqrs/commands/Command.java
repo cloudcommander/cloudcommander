@@ -1,4 +1,6 @@
 package com.cloudcommander.vendor.cqrs.commands;
 
-public abstract class Command {
+import com.cloudcommander.vendor.cqrs.Message;
+
+public abstract class Command extends Message{
 }

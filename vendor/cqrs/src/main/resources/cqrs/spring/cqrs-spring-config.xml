@@ -9,11 +9,19 @@
     <alias name="defaultAggregateRegistry" alias="aggregateRegistry"/>
     <bean id="defaultAggregateRegistry" class="com.cloudcommander.vendor.cqrs.aggregates.registry.DefaultAggregateRegistry"/>
 
+    <bean id="defaultMessageBusDispatcher"
+          abstract="true"
+          class="com.cloudcommander.vendor.cqrs.bus.dispatchers.DefaultMessageBusDispatcher"/>
+
+    <bean id="defaultMessageBusConsumer"
+          abstract="true"
+          class="com.cloudcommander.vendor.cqrs.bus.consumers.DefaultMessageBusConsumer"/>
+
     <alias name="defaultCommandBusDispatcher" alias="commandBusDispatcher"/>
-    <bean id="defaultCommandBusDispatcher" class="com.cloudcommander.vendor.cqrs.commands.bus.dispatchers.DefaultCommandBusDispatcher"/>
+    <bean id="defaultCommandBusDispatcher" parent="defaultMessageBusDispatcher"/>
 
     <alias name="defaultCommandBusConsumer" alias="commandBusConsumer"/>
-    <bean id="defaultCommandBusConsumer" class="com.cloudcommander.vendor.cqrs.commands.bus.consumers.DefaultCommandBusConsumer">
+    <bean id="defaultCommandBusConsumer" parent="defaultMessageBusConsumer">
         <constructor-arg ref="commandBusDispatcher"/>
     </bean>
 </beans>

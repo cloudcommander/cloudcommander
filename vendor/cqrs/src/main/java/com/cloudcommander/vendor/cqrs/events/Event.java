@@ -1,4 +1,6 @@
 package com.cloudcommander.vendor.cqrs.events;
 
-public abstract class Event {
+import com.cloudcommander.vendor.cqrs.Message;
+
+public abstract class Event extends Message{
 }
