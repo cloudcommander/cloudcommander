@@ -24,4 +24,12 @@
     <bean id="defaultCommandBusConsumer" parent="defaultMessageBusConsumer">
         <constructor-arg ref="commandBusDispatcher"/>
     </bean>
+
+    <alias name="defaultEventBusDispatcher" alias="eventBusDispatcher"/>
+    <bean id="defaultEventBusDispatcher" parent="defaultMessageBusDispatcher"/>
+
+    <alias name="defaultEventBusConsumer" alias="eventBusConsumer"/>
+    <bean id="defaultEventBusConsumer" parent="defaultMessageBusConsumer">
+        <constructor-arg ref="eventBusDispatcher"/>
+    </bean>
 </beans>
