@@ -10,13 +10,13 @@ public class DefaultMessageBusConsumer<T extends Message> implements MessageBusC
 
     private Publisher publisher;
 
-    public DefaultMessageBusConsumer(LocalMessageBusDispatcher<T> commandBusDispatcher){
+    public DefaultMessageBusConsumer(LocalMessageBusDispatcher<T> messageBusDispatcher){
         publisher = Flowable.create((subscriber -> {
             LocalMessageBusDispatcher.OnDispatchListener<T> onDispatchListener = subscriber::onNext;
 
-            commandBusDispatcher.addOnDispatchListener(onDispatchListener);
+            messageBusDispatcher.addOnDispatchListener(onDispatchListener);
 
-            subscriber.setCancellable(() -> commandBusDispatcher.removeOnDispatchEventListener(onDispatchListener));
+            subscriber.setCancellable(() -> messageBusDispatcher.removeOnDispatchEventListener(onDispatchListener));
         }), BackpressureStrategy.BUFFER);
     }
 
