@@ -1,7 +1,9 @@
 package com.cloudcommander.vendor.cqrs.bus.dispatchers;
 
 import com.cloudcommander.vendor.cqrs.Message;
+import com.cloudcommander.vendor.cqrs.bus.MessageWrapper;
+import io.reactivex.Single;
 
 public interface MessageBusDispatcher <T extends Message>{
-    void dispatch(T message);
+    Single<MessageWrapper<T>> dispatch(T message);
 }
