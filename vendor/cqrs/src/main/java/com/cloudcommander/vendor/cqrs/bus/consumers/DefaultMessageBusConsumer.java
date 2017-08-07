@@ -1,12 +1,13 @@
 package com.cloudcommander.vendor.cqrs.bus.consumers;
 
 import com.cloudcommander.vendor.cqrs.Message;
+import com.cloudcommander.vendor.cqrs.bus.BusMessage;
 import com.cloudcommander.vendor.cqrs.bus.dispatchers.LocalMessageBusDispatcher;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import org.reactivestreams.Publisher;
 
-public class DefaultMessageBusConsumer<T extends Message> implements MessageBusConsumer<T>{
+public class DefaultMessageBusConsumer<T extends BusMessage> implements MessageBusConsumer<T>{
 
     private Publisher publisher;
 

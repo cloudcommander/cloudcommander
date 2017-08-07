@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.cqrs.bus.dispatchers.strategies;
+package com.cloudcommander.vendor.cqrs.services.strategies;
 
 import java.util.UUID;
 

@@ -11,9 +11,7 @@
 
     <bean id="defaultMessageBusDispatcher"
           abstract="true"
-          class="com.cloudcommander.vendor.cqrs.bus.dispatchers.DefaultMessageBusDispatcher">
-        <property name="uuidGenerationStrategy" ref="uuidGenerationStrategy"/>
-    </bean>
+          class="com.cloudcommander.vendor.cqrs.bus.dispatchers.DefaultMessageBusDispatcher"/>
 
     <bean id="defaultMessageBusConsumer"
           abstract="true"
@@ -46,8 +44,9 @@
     <alias name="defaultCQRSWriteService" alias="CQRSWriteService"/>
     <bean id="defaultCQRSWriteService" class="com.cloudcommander.vendor.cqrs.services.DefaultCQRSWriteService">
         <property name="commandBusDispatcher" ref="commandBusDispatcher"/>
+        <property name="uuidGenerationStrategy" ref="uuidGenerationStrategy"/>
     </bean>
 
     <alias name="defaultUuidGenerationStrategy" alias="uuidGenerationStrategy"/>
-    <bean id="defaultUuidGenerationStrategy" class="com.cloudcommander.vendor.cqrs.bus.dispatchers.strategies.DefaultUuidGenerationStrategy"/>
+    <bean id="defaultUuidGenerationStrategy" class="com.cloudcommander.vendor.cqrs.services.strategies.DefaultUuidGenerationStrategy"/>
 </beans>
