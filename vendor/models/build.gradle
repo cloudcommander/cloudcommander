@@ -5,4 +5,5 @@ apply plugin: 'com.cloudcommander.module'
 
 dependencies{
     compile project(':vendor:module')
+    compileOnly 'org.projectlombok:lombok:1.16.18'
 }
