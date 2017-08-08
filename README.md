@@ -1,5 +1,5 @@
 # Cloud-Commander Framework
-Cloud-Commander is a modular Java CQRS Framework using Gradle and Spring Boot.
+Cloud-Commander is a modular Java Framework using Gradle and Spring Boot.
 
 **The Framework is not yet production ready.**
 
