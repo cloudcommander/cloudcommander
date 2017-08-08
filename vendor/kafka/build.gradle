@@ -1,8 +1,0 @@
-group 'com.cloudcommander.vendor.kafka'
-version '1.0-SNAPSHOT'
-
-apply plugin: 'com.cloudcommander.module'
-
-dependencies{
-    compile project(':vendor:module')
-}
