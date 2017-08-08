@@ -1,4 +1,4 @@
 package com.cloudcommander.vendor.cqrs.commands;
 
-public class Command {
+public abstract class Command {
 }
