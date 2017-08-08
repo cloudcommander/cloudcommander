@@ -5,7 +5,6 @@ apply plugin: 'com.cloudcommander.module'
 
 dependencies{
     compile project(':vendor:application')
-    compile project(':vendor:warehouses')
 }
 
 bootRepackage{
