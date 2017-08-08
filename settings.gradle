@@ -4,5 +4,4 @@ include ':custom:applications:standalone',
         ':vendor:application',
         ':vendor:module',
         ':vendor:cqrs',
-        ':vendor:kafka',
         ':vendor:warehouses'
