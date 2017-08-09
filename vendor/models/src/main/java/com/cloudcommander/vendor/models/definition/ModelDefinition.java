@@ -1,14 +1,22 @@
 package com.cloudcommander.vendor.models.definition;
 
-import lombok.Data;
-import lombok.experimental.Wither;
+import java.util.List;
 
-import java.util.Set;
-
-@Data
-@Wither
 public class ModelDefinition {
-    String name;
+    private String name;
 
-    Set<AttributeDefinition> attributes;
+    private List<AttributeDefinition> attributes;
+
+    public ModelDefinition(String name, List<AttributeDefinition> attributes) {
+        this.name = name;
+        this.attributes = attributes;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<AttributeDefinition> getAttributes() {
+        return attributes;
+    }
 }

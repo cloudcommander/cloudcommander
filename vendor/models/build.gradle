@@ -6,4 +6,6 @@ apply plugin: 'com.cloudcommander.module'
 dependencies{
     compile project(':vendor:module')
     compileOnly 'org.projectlombok:lombok:1.16.18'
+
+    testCompile "junit:junit:4.12"
 }

@@ -1,10 +1,16 @@
 package com.cloudcommander.vendor.models.definition;
 
-import lombok.Data;
-import lombok.experimental.Wither;
+import java.util.List;
 
-@Data
-@Wither
 public class ModuleDatabaseDefinition extends DatabaseDefinition{
     String module;
+
+    public ModuleDatabaseDefinition(String module, String name, List<ModelDefinition> modelDefinitions) {
+        super(name, modelDefinitions);
+        this.module = module;
+    }
+
+    public String getModule() {
+        return module;
+    }
 }
