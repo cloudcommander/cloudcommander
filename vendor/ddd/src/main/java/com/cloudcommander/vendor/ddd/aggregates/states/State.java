@@ -1,4 +1,6 @@
 package com.cloudcommander.vendor.ddd.aggregates.states;
 
-public interface State {
+import java.io.Serializable;
+
+public interface State extends Serializable{
 }
