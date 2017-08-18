@@ -11,11 +11,12 @@
     <alias name="userAggregateDefinition" alias="defaultUserAggregateDefinition"/>
     <bean id="defaultUserAggregateDefinition"
           class="com.cloudcommander.vendor.ddd.aggregates.DefaultAggregateDefinition">
-        <constructor-arg index="0" ref="userStateFactory"/>
-        <constructor-arg index="1">
+        <constructor-arg index="0" ref="usersBoundedContext"/>
+        <constructor-arg index="1" ref="userStateFactory"/>
+        <constructor-arg index="2">
             <map/>
         </constructor-arg>
-        <constructor-arg index="2">
+        <constructor-arg index="3">
             <map/>
         </constructor-arg>
     </bean>
