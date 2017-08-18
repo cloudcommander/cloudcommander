@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databases>
+    <database>
+        <name>Users</name>
+        <models>
+            <model>
+                <name>User</name>
+                <attributes>
+                    <attribute>
+                        <name>id</name>
+                        <type>String</type>
+                    </attribute>
+                    <attribute>
+                        <name>username</name>
+                        <type>String</type>
+                    </attribute>
+                    <attribute>
+                        <name>email</name>
+                        <type>String</type>
+                    </attribute>
+                </attributes>
+                <indices>
+                    <index unique="true">
+                        <attribute name="id"/>
+                    </index>
+                    <index unique="true">
+                        <attribute name="username"/>
+                    </index>
+                    <index unique="true">
+                        <attribute name="email"/>
+                    </index>
+                </indices>
+            </model>
+        </models>
+    </database>
+</databases>
