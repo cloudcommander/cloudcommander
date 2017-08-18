@@ -1,0 +1,9 @@
+group 'com.cloudcommander.vendor.ddd'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.cloudcommander.module'
+
+dependencies{
+    compile project(':vendor:module')
+    testCompile 'junit:junit:4.12'
+}
