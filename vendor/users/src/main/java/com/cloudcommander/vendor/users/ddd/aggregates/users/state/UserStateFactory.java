@@ -1,6 +1,6 @@
 package com.cloudcommander.vendor.users.ddd.aggregates.users.state;
 
-import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
+import com.cloudcommander.vendor.ddd.aggregates.states.AggregateStateFactory;
 
-public interface UserStateFactory<T extends UserState> extends StateFactory<T>{
+public interface UserStateFactory<T extends UserState> extends AggregateStateFactory<T> {
 }

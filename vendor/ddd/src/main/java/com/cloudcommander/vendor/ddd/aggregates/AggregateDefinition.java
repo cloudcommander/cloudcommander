@@ -4,18 +4,19 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
-import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
+import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
+import com.cloudcommander.vendor.ddd.aggregates.states.AggregateStateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 
-import java.util.Map;
+import java.util.List;
 
 public interface AggregateDefinition {
 
     BoundedContextDefinition getBoundedContextDefinition();
 
-    StateFactory getStateFactory();
+    AggregateStateFactory<AggregateState> getStateFactory();
 
-    Map<Command, CommandHandler> getCommandHandlerMap();
+    List<CommandHandler<Command, AggregateState>> getCommandHandlers();
 
-    Map<Event, EventHandler> getEventHandlerMap();
+    List<EventHandler<Event, AggregateState>> getEventHandlers();
 }

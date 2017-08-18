@@ -1,5 +1,12 @@
 package com.cloudcommander.vendor.ddd.aggregates.commands;
 
-public interface CommandHandler<T extends Command> {
-    public void handle(T command);
+import com.cloudcommander.vendor.ddd.aggregates.events.Event;
+import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
+
+public interface CommandHandler<T extends Command, S extends AggregateState>{
+    Event handle(T event, S state);
+
+    Class<S> getStateClass();
+
+    Class<T> getCommandClass();
 }
