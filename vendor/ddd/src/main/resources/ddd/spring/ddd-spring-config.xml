@@ -4,4 +4,9 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <alias name="defaultDddActorSystem" alias="dddActorSystem"/>
+    <bean id="defaultDddActorSystem"
+        class="akka.actor.ActorSystem" factory-method="create">
+        <constructor-arg value="cloud-commander"/>
+    </bean>
 </beans>
