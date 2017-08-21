@@ -9,4 +9,22 @@
         class="akka.actor.ActorSystem" factory-method="create">
         <constructor-arg value="cloud-commander"/>
     </bean>
+
+    <alias name="defaultDddSupervisorActor" alias="dddSupervisorActor"/>
+    <bean id="defaultDddSupervisorActor"
+          factory-bean="dddActorSystem" factory-method="actorOf">
+        <constructor-arg index="0">
+            <bean class="akka.actor.Props" factory-method="create">
+                <constructor-arg index="0">
+                    <bean class="java.lang.Class" factory-method="forName">
+                        <constructor-arg index="0" value="com.cloudcommander.vendor.ddd.akka.actors.DddSupervisorActor"/>
+                    </bean>
+                </constructor-arg>
+                <constructor-arg index="1">
+                    <list/>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+        <constructor-arg index="1" value="ddd" type="java.lang.String"/>
+    </bean>
 </beans>

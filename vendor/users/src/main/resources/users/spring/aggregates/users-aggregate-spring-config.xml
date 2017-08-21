@@ -4,11 +4,11 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <alias name="userStateFactory" alias="defaultUserStateFactory"/>
+    <alias name="defaultUserStateFactory" alias="userStateFactory"/>
     <bean id="defaultUserStateFactory"
           class="com.cloudcommander.vendor.users.ddd.aggregates.users.state.DefaultUserStateFactory"/>
 
-    <alias name="userAggregateDefinition" alias="defaultUserAggregateDefinition"/>
+    <alias name="defaultUserAggregateDefinition" alias="userAggregateDefinition"/>
     <bean id="defaultUserAggregateDefinition"
           class="com.cloudcommander.vendor.ddd.aggregates.DefaultAggregateDefinition">
         <constructor-arg index="0" ref="usersBoundedContext"/>
