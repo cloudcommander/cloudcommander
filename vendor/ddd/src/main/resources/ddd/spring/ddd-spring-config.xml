@@ -21,5 +21,16 @@
     >
         <constructor-arg index="0" ref="dddActorSystem"/>
         <constructor-arg index="1" ref="dddShardMessageExtractor"/>
+        <constructor-arg index="2" ref="dddServiceTimeout"/>
+    </bean>
+
+    <alias name="defaultDddServiceTimeout" alias="dddServiceTimeout"/>
+    <bean id="defaultDddServiceTimeout" class="akka.util.Timeout">
+        <constructor-arg index="0">
+            <bean class="scala.concurrent.duration.Duration" factory-method="create">
+                <constructor-arg index="0" value="30"/>
+                <constructor-arg index="1" value="seconds"/>
+            </bean>
+        </constructor-arg>
     </bean>
 </beans>

@@ -24,6 +24,6 @@
 
     <alias name="defaultUsersDddService" alias="usersDddService"/>
     <bean id="defaultUsersDddService" parent="dddService">
-        <constructor-arg index="2" ref="userAggregateDefinition"/>
+        <constructor-arg index="3" ref="userAggregateDefinition"/>
     </bean>
 </beans>
