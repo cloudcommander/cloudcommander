@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface AggregateDefinition {
 
+    String getName();
+
     BoundedContextDefinition getBoundedContextDefinition();
 
     AggregateStateFactory<AggregateState> getStateFactory();

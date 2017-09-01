@@ -17,13 +17,11 @@ import java.util.Map;
 
 public class AggregateActor extends AbstractPersistentActor {
 
-    private final String aggregateName;
     private final AggregateDefinition aggregateDefinition;
 
     private AggregateState state;
 
-    public AggregateActor(String aggregateName, final AggregateDefinition aggregateDefinition){
-        this.aggregateName = aggregateName;
+    public AggregateActor(final AggregateDefinition aggregateDefinition){
         this.aggregateDefinition = aggregateDefinition;
     }
 
@@ -86,6 +84,7 @@ public class AggregateActor extends AbstractPersistentActor {
 
     @Override
     public String persistenceId() {
+        String aggregateName = aggregateDefinition.getName();
         BoundedContextDefinition boundedContextDefinition = aggregateDefinition.getBoundedContextDefinition();
 
         return boundedContextDefinition.getName() + '-' + aggregateName + '-' + getSelf().path().name();

@@ -13,6 +13,8 @@ import java.util.List;
 
 public class DefaultAggregateDefinition implements AggregateDefinition{
 
+    private String name;
+
     private BoundedContextDefinition boundedContextDefinition;
 
     private AggregateStateFactory stateFactory;
@@ -21,11 +23,17 @@ public class DefaultAggregateDefinition implements AggregateDefinition{
 
     private final List<EventHandler<Event, AggregateState>> eventHandlers;
 
-    public DefaultAggregateDefinition(BoundedContextDefinition boundedContextDefinition, AggregateStateFactory stateFactory, final List<CommandHandler<Command, AggregateState>> commandHandlers, final List<EventHandler<Event, AggregateState>> eventHandlers) {
+    public DefaultAggregateDefinition(String name, BoundedContextDefinition boundedContextDefinition, AggregateStateFactory stateFactory, final List<CommandHandler<Command, AggregateState>> commandHandlers, final List<EventHandler<Event, AggregateState>> eventHandlers) {
+        this.name = name;
         this.boundedContextDefinition = boundedContextDefinition;
         this.stateFactory = stateFactory;
         this.commandHandlers = Collections.unmodifiableList(commandHandlers);
         this.eventHandlers = Collections.unmodifiableList(eventHandlers);
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override

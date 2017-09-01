@@ -10,21 +10,16 @@
         <constructor-arg value="cloud-commander"/>
     </bean>
 
-    <alias name="defaultDddSupervisorActor" alias="dddSupervisorActor"/>
-    <bean id="defaultDddSupervisorActor"
-          factory-bean="dddActorSystem" factory-method="actorOf">
-        <constructor-arg index="0">
-            <bean class="akka.actor.Props" factory-method="create">
-                <constructor-arg index="0">
-                    <bean class="java.lang.Class" factory-method="forName">
-                        <constructor-arg index="0" value="com.cloudcommander.vendor.ddd.akka.actors.DddSupervisorActor"/>
-                    </bean>
-                </constructor-arg>
-                <constructor-arg index="1">
-                    <list/>
-                </constructor-arg>
-            </bean>
-        </constructor-arg>
-        <constructor-arg index="1" value="ddd" type="java.lang.String"/>
+    <alias name="defaultDddShardMessageExtractor" alias="dddShardMessageExtractor"/>
+    <bean id="defaultDddShardMessageExtractor" class="com.cloudcommander.vendor.ddd.aggregates.clustering.DefaultDddMessageExtractor">
+        <constructor-arg index="0" value="5"/>
+    </bean>
+
+    <alias name="defaultDddService" alias="dddService"/>
+    <bean id="defaultDddService" abstract="true"
+        class="com.cloudcommander.vendor.ddd.services.DefaultDddService"
+    >
+        <constructor-arg index="0" ref="dddActorSystem"/>
+        <constructor-arg index="1" ref="dddShardMessageExtractor"/>
     </bean>
 </beans>

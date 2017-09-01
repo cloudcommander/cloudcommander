@@ -11,13 +11,19 @@
     <alias name="defaultUserAggregateDefinition" alias="userAggregateDefinition"/>
     <bean id="defaultUserAggregateDefinition"
           class="com.cloudcommander.vendor.ddd.aggregates.DefaultAggregateDefinition">
-        <constructor-arg index="0" ref="usersBoundedContext"/>
-        <constructor-arg index="1" ref="userStateFactory"/>
-        <constructor-arg index="2">
-            <list/>
-        </constructor-arg>
+        <constructor-arg index="0" value="User"/>
+        <constructor-arg index="1" ref="usersBoundedContext"/>
+        <constructor-arg index="2" ref="userStateFactory"/>
         <constructor-arg index="3">
             <list/>
         </constructor-arg>
+        <constructor-arg index="4">
+            <list/>
+        </constructor-arg>
+    </bean>
+
+    <alias name="defaultUsersDddService" alias="usersDddService"/>
+    <bean id="defaultUsersDddService" parent="dddService">
+        <constructor-arg index="2" ref="userAggregateDefinition"/>
     </bean>
 </beans>
