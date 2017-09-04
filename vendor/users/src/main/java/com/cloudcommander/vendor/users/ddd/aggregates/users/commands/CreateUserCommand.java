@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.users.ddd.aggregates.users.state;
+package com.cloudcommander.vendor.users.ddd.aggregates.users.commands;
 
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 

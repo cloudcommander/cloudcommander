@@ -8,14 +8,19 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
+import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
 import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AggregateActor extends AbstractPersistentActor {
+
+    private static Logger LOG = LogManager.getLogger(AggregateActor.class);
 
     private final AggregateDefinition aggregateDefinition;
 
@@ -78,6 +83,15 @@ public class AggregateActor extends AbstractPersistentActor {
                 });
             });
         }
+
+        receiveBuilder.matchAny(o -> {
+            if(LOG.isWarnEnabled()){
+                LOG.warn("Unhandled command type [" + o.getClass() + "] for actor: [" + getSelf().path().toStringWithoutAddress() + "]");
+            }
+
+            UnhandledCommandResponse unhandledCommandResponse = new UnhandledCommandResponse(o.getClass());
+            getSender().tell(unhandledCommandResponse, getSelf());
+        });
 
         return receiveBuilder.build();
     }

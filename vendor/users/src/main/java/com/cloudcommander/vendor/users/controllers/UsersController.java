@@ -1,7 +1,8 @@
 package com.cloudcommander.vendor.users.controllers;
 
+import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
 import com.cloudcommander.vendor.ddd.services.DddService;
-import com.cloudcommander.vendor.users.ddd.aggregates.users.state.CreateUserCommand;
+import com.cloudcommander.vendor.users.ddd.aggregates.users.commands.CreateUserCommand;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,11 @@ public class UsersController {
 
         return completionStage
                 .thenApply(o -> {
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    if(o instanceof UnhandledCommandResponse){
+                        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    }else{
+                        return new ResponseEntity<>(HttpStatus.OK);
+                    }
                 })
                 .exceptionally(throwable -> {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
