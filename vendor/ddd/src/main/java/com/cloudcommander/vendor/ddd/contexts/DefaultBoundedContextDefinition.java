@@ -10,6 +10,6 @@ public class DefaultBoundedContextDefinition implements BoundedContextDefinition
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 }
