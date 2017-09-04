@@ -107,6 +107,7 @@ class CCModuleTask extends DefaultTask {
         return TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ClassName.get("org.springframework.context.annotation", 'Configuration'))
+                .addAnnotation(ClassName.get("org.springframework.boot.autoconfigure", "EnableAutoConfiguration"))
                 .addAnnotation(resourceAnnotationSpec)
                 .build();
     }
