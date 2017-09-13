@@ -1,5 +1,6 @@
 package com.cloudcommander.vendor.ddd.akka.actors;
 
+import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
@@ -106,5 +107,9 @@ public class AggregateActor extends AbstractPersistentActor {
 
     protected AggregateDefinition getAggregateDefinition() {
         return aggregateDefinition;
+    }
+
+    public static Props props(final AggregateDefinition aggregateDefinition) {
+        return Props.create(AggregateActor.class, () -> new AggregateActor(aggregateDefinition));
     }
 }

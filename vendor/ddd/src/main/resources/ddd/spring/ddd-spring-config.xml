@@ -10,18 +10,12 @@
         <constructor-arg value="cloud-commander"/>
     </bean>
 
-    <alias name="defaultDddShardMessageExtractor" alias="dddShardMessageExtractor"/>
-    <bean id="defaultDddShardMessageExtractor" class="com.cloudcommander.vendor.ddd.aggregates.clustering.DefaultDddMessageExtractor">
-        <constructor-arg index="0" value="5"/>
-    </bean>
-
     <alias name="defaultDddService" alias="dddService"/>
     <bean id="defaultDddService" abstract="true"
         class="com.cloudcommander.vendor.ddd.services.DefaultDddService"
     >
         <constructor-arg index="0" ref="dddActorSystem"/>
-        <constructor-arg index="1" ref="dddShardMessageExtractor"/>
-        <constructor-arg index="2" ref="dddServiceTimeout"/>
+        <constructor-arg index="1" ref="dddServiceTimeout"/>
     </bean>
 
     <alias name="defaultDddServiceTimeout" alias="dddServiceTimeout"/>
