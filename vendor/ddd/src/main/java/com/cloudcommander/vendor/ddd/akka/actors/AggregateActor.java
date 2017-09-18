@@ -81,6 +81,8 @@ public class AggregateActor extends AbstractPersistentActor {
                     if(eventHandler != null){
                         eventHandler.handle(event, state);
                     }
+
+                    getSender().tell(event, getSelf());
                 });
             });
         }
