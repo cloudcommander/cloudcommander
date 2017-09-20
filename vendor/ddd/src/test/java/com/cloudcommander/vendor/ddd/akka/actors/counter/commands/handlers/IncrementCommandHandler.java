@@ -8,9 +8,9 @@ import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterState;
 
 import java.util.UUID;
 
-public class IncrementCommandHandler implements CommandHandler<IncrementCommand, CounterState> {
+public class IncrementCommandHandler implements CommandHandler<IncrementCommand, ValueChangedEvent, CounterState> {
     @Override
-    public Event handle(IncrementCommand cmd, CounterState state) {
+    public ValueChangedEvent handle(IncrementCommand cmd, CounterState state) {
         UUID uuid = cmd.getUuid();
         long newValue = state.getValue() + 1;
 

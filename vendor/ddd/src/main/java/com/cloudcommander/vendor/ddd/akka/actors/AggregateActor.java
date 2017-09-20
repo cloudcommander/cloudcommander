@@ -9,7 +9,10 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
+import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
+import com.cloudcommander.vendor.ddd.aggregates.queries.QueryHandler;
 import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
+import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
@@ -20,11 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AggregateActor<T extends Command, S extends State> extends AbstractPersistentActor {
+public class AggregateActor<T extends Command, U extends Event, V extends Query, W extends Result, S extends State> extends AbstractPersistentActor {
 
     private static Logger LOG = LogManager.getLogger(AggregateActor.class);
 
-    private final AggregateDefinition<T, S> aggregateDefinition;
+    private final AggregateDefinition<T, U, V, W, S> aggregateDefinition;
 
     private S state;
 
@@ -49,9 +52,9 @@ public class AggregateActor<T extends Command, S extends State> extends Abstract
         });
 
         //Handle defined events
-        List<EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State>> eventHandlers = aggregateDefinition.getEventHandlers();
-        for(EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State> eventHandler: eventHandlers){
-            Class<Event> eventClass = eventHandler.getEventClass();
+        List<? extends EventHandler<U, S>> eventHandlers = aggregateDefinition.getEventHandlers();
+        for(EventHandler<U, S> eventHandler: eventHandlers){
+            Class<U> eventClass = eventHandler.getEventClass();
             receiveBuilder.match(eventClass, event -> {
                 eventHandler.handle(event, state);
             });
@@ -68,11 +71,11 @@ public class AggregateActor<T extends Command, S extends State> extends Abstract
     @Override
     public Receive createReceive() {
         //Create event handler map
-        List<EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State>> eventHandlers = aggregateDefinition.getEventHandlers();
+        List<? extends EventHandler<U, S>> eventHandlers = aggregateDefinition.getEventHandlers();
 
-        final Map<Class<Event>, EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State>> eventHandlerMap = new HashMap<>(eventHandlers.size());
-        for(final EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State> eventHandler: eventHandlers){
-            Class<Event> eventClass = eventHandler.getEventClass();
+        final Map<Class<U>, EventHandler<U, S>> eventHandlerMap = new HashMap<>(eventHandlers.size());
+        for(final EventHandler<U, S> eventHandler: eventHandlers){
+            Class<U> eventClass = eventHandler.getEventClass();
 
             eventHandlerMap.put(eventClass, eventHandler);
         }
@@ -81,15 +84,15 @@ public class AggregateActor<T extends Command, S extends State> extends Abstract
         ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
 
         //Handle defined commands
-        List<? extends CommandHandler<T, S>> commandHandlers = aggregateDefinition.getCommandHandlers();
-        for(CommandHandler<T, S> commandHandler: commandHandlers){
+        List<? extends CommandHandler<T, U, S>> commandHandlers = aggregateDefinition.getCommandHandlers();
+        for(CommandHandler<T, U, S> commandHandler: commandHandlers){
             Class<T> commandClass = commandHandler.getCommandClass();
             receiveBuilder.match(commandClass, command -> {
-                final Event event = commandHandler.handle(command, state);
+                final U event = commandHandler.handle(command, state);
 
                 persist(event, param -> {
                     Class<? extends Event> eventClass = event.getClass();
-                    EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State> eventHandler = eventHandlerMap.get(eventClass);
+                    EventHandler<U, S> eventHandler = eventHandlerMap.get(eventClass);
 
                     if(eventHandler != null){
                         eventHandler.handle(event, state);
@@ -97,6 +100,17 @@ public class AggregateActor<T extends Command, S extends State> extends Abstract
 
                     getSender().tell(event, getSelf());
                 });
+            });
+        }
+
+        //Handle defined queries
+        List<? extends QueryHandler<V, W, S>> queryHandlers = aggregateDefinition.getQueryHandlers();
+        for(QueryHandler<V, W, S> queryHandler: queryHandlers){
+            Class<V> queryClass = queryHandler.getQueryClass();
+            receiveBuilder.match(queryClass, query -> {
+                final Result result = queryHandler.handle(query, state);
+
+                getSender().tell(result, getSelf());
             });
         }
 

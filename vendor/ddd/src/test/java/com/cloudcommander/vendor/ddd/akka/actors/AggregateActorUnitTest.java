@@ -12,12 +12,18 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
+import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
+import com.cloudcommander.vendor.ddd.aggregates.queries.QueryHandler;
 import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
+import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.handlers.IncrementCommandHandler;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.events.handers.ValueChangedEventHandler;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.GetValueQuery;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.handlers.GetValueQueryHandler;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.results.ValueResult;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterStateFactory;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
@@ -54,7 +60,7 @@ public class AggregateActorUnitTest{
     @Test
     public void testNonMappedCommand(){
         new TestKit(system) {{
-            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, Collections.emptyList(), Collections.emptyList());
+            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
             final ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition));
             final ActorRef probe = getRef();
@@ -68,15 +74,28 @@ public class AggregateActorUnitTest{
     @Test
     public void testCounterAggregate(){
         new TestKit(system) {{
-            List<CommandHandler<? extends Command, ? extends State>> commandHandlers = Collections.singletonList(new IncrementCommandHandler());
+            List<CommandHandler<? extends Command, ? extends Event, ? extends State>> commandHandlers = Collections.singletonList(new IncrementCommandHandler());
             List<EventHandler<? extends Event, ? extends State>> eventHandlers = Collections.singletonList(new ValueChangedEventHandler());
-            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, commandHandlers, eventHandlers);
+            List<QueryHandler<? extends Query, ? extends Result, ? extends State>> queryHandlers = Collections.singletonList(new GetValueQueryHandler());
+            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, commandHandlers, eventHandlers, queryHandlers);
 
             ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition), "testCounter");
             final ActorRef probe = getRef();
 
             UUID uuid = UUID.randomUUID();
 
+            {
+                aggregateRef.tell(new GetValueQuery(uuid), probe);
+
+                List<Object> messages = receiveN(1, duration("1 second"));
+                Assert.assertEquals(1, messages.size());
+
+                Object firstMessage = messages.get(0);
+                Assert.assertTrue(firstMessage instanceof ValueResult);
+
+                ValueResult valueResult = (ValueResult) firstMessage;
+                Assert.assertEquals(0, valueResult.getValue());
+            }
             {
                 aggregateRef.tell(new IncrementCommand(uuid), probe);
 
@@ -122,6 +141,19 @@ public class AggregateActorUnitTest{
                 ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
                 Assert.assertEquals(uuid, valueChangedEvent.getCounterUuid());
                 Assert.assertEquals(3, valueChangedEvent.getNewValue());
+            }
+
+            {
+                aggregateRef.tell(new GetValueQuery(uuid), probe);
+
+                List<Object> messages = receiveN(1, duration("1 second"));
+                Assert.assertEquals(1, messages.size());
+
+                Object firstMessage = messages.get(0);
+                Assert.assertTrue(firstMessage instanceof ValueResult);
+
+                ValueResult valueResult = (ValueResult) firstMessage;
+                Assert.assertEquals(3, valueResult.getValue());
             }
         }};
     }

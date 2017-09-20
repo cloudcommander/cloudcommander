@@ -20,6 +20,9 @@
         <constructor-arg index="4">
             <list/>
         </constructor-arg>
+        <constructor-arg index="5">
+            <list/>
+        </constructor-arg>
     </bean>
 
     <alias name="defaultUsersDddService" alias="usersDddService"/>
