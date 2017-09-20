@@ -1,5 +1,5 @@
 package com.cloudcommander.vendor.ddd.aggregates.states;
 
-public interface AggregateStateFactory<T extends AggregateState>{
+public interface StateFactory<T extends State>{
     public T create();
 }

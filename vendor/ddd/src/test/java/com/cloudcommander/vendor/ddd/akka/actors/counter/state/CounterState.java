@@ -1,8 +1,8 @@
 package com.cloudcommander.vendor.ddd.akka.actors.counter.state;
 
-import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
+import com.cloudcommander.vendor.ddd.aggregates.states.State;
 
-public class CounterState implements AggregateState {
+public class CounterState implements State {
 
     private long value = 0;
 

@@ -1,12 +1,12 @@
 package com.cloudcommander.vendor.ddd.akka.actors.counter.events.handers;
 
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.CounterValueChangedEvent;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterState;
 
-public class CounterValueChangedEventHandler implements EventHandler<CounterValueChangedEvent, CounterState> {
+public class ValueChangedEventHandler implements EventHandler<ValueChangedEvent, CounterState> {
     @Override
-    public void handle(CounterValueChangedEvent event, CounterState state) {
+    public void handle(ValueChangedEvent event, CounterState state) {
         long newValue = event.getNewValue();
         state.setValue(newValue);
     }
@@ -17,7 +17,7 @@ public class CounterValueChangedEventHandler implements EventHandler<CounterValu
     }
 
     @Override
-    public Class<CounterValueChangedEvent> getEventClass() {
-        return CounterValueChangedEvent.class;
+    public Class<ValueChangedEvent> getEventClass() {
+        return ValueChangedEvent.class;
     }
 }

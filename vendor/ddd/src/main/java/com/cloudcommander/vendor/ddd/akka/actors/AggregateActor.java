@@ -3,7 +3,6 @@ package com.cloudcommander.vendor.ddd.akka.actors;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.AbstractPersistentActor;
-import akka.persistence.RecoveryCompleted;
 import akka.persistence.SnapshotOffer;
 import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
@@ -11,8 +10,8 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
 import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
-import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
-import com.cloudcommander.vendor.ddd.aggregates.states.AggregateStateFactory;
+import com.cloudcommander.vendor.ddd.aggregates.states.State;
+import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -21,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AggregateActor<T extends Command, S extends AggregateState> extends AbstractPersistentActor {
+public class AggregateActor<T extends Command, S extends State> extends AbstractPersistentActor {
 
     private static Logger LOG = LogManager.getLogger(AggregateActor.class);
 
@@ -36,8 +35,8 @@ public class AggregateActor<T extends Command, S extends AggregateState> extends
     }
 
     protected void setInitialState(){
-        final AggregateStateFactory<S> aggregateStateFactory =  aggregateDefinition.getStateFactory();
-        state = aggregateStateFactory.create();
+        final StateFactory<S> stateFactory =  aggregateDefinition.getStateFactory();
+        state = stateFactory.create();
     }
 
     @Override
@@ -50,8 +49,8 @@ public class AggregateActor<T extends Command, S extends AggregateState> extends
         });
 
         //Handle defined events
-        List<EventHandler<Event, AggregateState>> eventHandlers = aggregateDefinition.getEventHandlers();
-        for(EventHandler<Event, AggregateState> eventHandler: eventHandlers){
+        List<EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State>> eventHandlers = aggregateDefinition.getEventHandlers();
+        for(EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State> eventHandler: eventHandlers){
             Class<Event> eventClass = eventHandler.getEventClass();
             receiveBuilder.match(eventClass, event -> {
                 eventHandler.handle(event, state);
@@ -69,10 +68,10 @@ public class AggregateActor<T extends Command, S extends AggregateState> extends
     @Override
     public Receive createReceive() {
         //Create event handler map
-        List<EventHandler<Event, AggregateState>> eventHandlers = aggregateDefinition.getEventHandlers();
+        List<EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State>> eventHandlers = aggregateDefinition.getEventHandlers();
 
-        final Map<Class<Event>, EventHandler<Event, AggregateState>> eventHandlerMap = new HashMap<>(eventHandlers.size());
-        for(final EventHandler<Event, AggregateState> eventHandler: eventHandlers){
+        final Map<Class<Event>, EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State>> eventHandlerMap = new HashMap<>(eventHandlers.size());
+        for(final EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State> eventHandler: eventHandlers){
             Class<Event> eventClass = eventHandler.getEventClass();
 
             eventHandlerMap.put(eventClass, eventHandler);
@@ -90,7 +89,7 @@ public class AggregateActor<T extends Command, S extends AggregateState> extends
 
                 persist(event, param -> {
                     Class<? extends Event> eventClass = event.getClass();
-                    EventHandler<Event, AggregateState> eventHandler = eventHandlerMap.get(eventClass);
+                    EventHandler<Event, com.cloudcommander.vendor.ddd.aggregates.states.State> eventHandler = eventHandlerMap.get(eventClass);
 
                     if(eventHandler != null){
                         eventHandler.handle(event, state);
