@@ -19,11 +19,11 @@ public class DefaultAggregateDefinition implements AggregateDefinition{
 
     private AggregateStateFactory stateFactory;
 
-    private final List<CommandHandler<Command, AggregateState>> commandHandlers;
+    private final List<CommandHandler<? extends Command, ? extends AggregateState>> commandHandlers;
 
-    private final List<EventHandler<Event, AggregateState>> eventHandlers;
+    private final List<EventHandler<? extends Event, ? extends AggregateState>> eventHandlers;
 
-    public DefaultAggregateDefinition(String name, BoundedContextDefinition boundedContextDefinition, AggregateStateFactory stateFactory, final List<CommandHandler<Command, AggregateState>> commandHandlers, final List<EventHandler<Event, AggregateState>> eventHandlers) {
+    public DefaultAggregateDefinition(String name, BoundedContextDefinition boundedContextDefinition, AggregateStateFactory stateFactory, final List<CommandHandler<? extends Command, ? extends AggregateState>> commandHandlers, final List<EventHandler<? extends Event, ? extends AggregateState>> eventHandlers) {
         this.name = name;
         this.boundedContextDefinition = boundedContextDefinition;
         this.stateFactory = stateFactory;
@@ -47,12 +47,12 @@ public class DefaultAggregateDefinition implements AggregateDefinition{
     }
 
     @Override
-    public List<CommandHandler<Command, AggregateState>> getCommandHandlers() {
+    public List<CommandHandler<? extends Command, ? extends AggregateState>> getCommandHandlers() {
         return commandHandlers;
     }
 
     @Override
-    public List<EventHandler<Event, AggregateState>> getEventHandlers() {
+    public List<EventHandler<? extends Event, ? extends AggregateState>> getEventHandlers() {
         return eventHandlers;
     }
 }

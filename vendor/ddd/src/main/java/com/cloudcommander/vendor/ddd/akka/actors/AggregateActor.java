@@ -3,6 +3,7 @@ package com.cloudcommander.vendor.ddd.akka.actors;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.AbstractPersistentActor;
+import akka.persistence.RecoveryCompleted;
 import akka.persistence.SnapshotOffer;
 import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
@@ -11,6 +12,7 @@ import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
 import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
 import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
+import com.cloudcommander.vendor.ddd.aggregates.states.AggregateStateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -19,16 +21,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AggregateActor extends AbstractPersistentActor {
+public class AggregateActor<T extends Command, S extends AggregateState> extends AbstractPersistentActor {
 
     private static Logger LOG = LogManager.getLogger(AggregateActor.class);
 
-    private final AggregateDefinition aggregateDefinition;
+    private final AggregateDefinition<T, S> aggregateDefinition;
 
-    private AggregateState state;
+    private S state;
 
     public AggregateActor(final AggregateDefinition aggregateDefinition){
         this.aggregateDefinition = aggregateDefinition;
+
+        setInitialState();
+    }
+
+    protected void setInitialState(){
+        final AggregateStateFactory<S> aggregateStateFactory =  aggregateDefinition.getStateFactory();
+        state = aggregateStateFactory.create();
     }
 
     @Override
@@ -37,7 +46,7 @@ public class AggregateActor extends AbstractPersistentActor {
 
         //Restore from snapshots
         receiveBuilder.match(SnapshotOffer.class, snapshotOffer -> {
-            state = (AggregateState)snapshotOffer.snapshot();
+            state = (S)snapshotOffer.snapshot();
         });
 
         //Handle defined events
@@ -50,6 +59,11 @@ public class AggregateActor extends AbstractPersistentActor {
         }
 
         return receiveBuilder.build();
+    }
+
+    @Override
+    public void onPersistRejected(Throwable cause, Object event, long seqNr) {
+        super.onPersistRejected(cause, event, seqNr);
     }
 
     @Override
@@ -68,9 +82,9 @@ public class AggregateActor extends AbstractPersistentActor {
         ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
 
         //Handle defined commands
-        List<CommandHandler<Command, AggregateState>> commandHandlers = aggregateDefinition.getCommandHandlers();
-        for(CommandHandler<Command, AggregateState> commandHandler: commandHandlers){
-            Class<Command> commandClass = commandHandler.getCommandClass();
+        List<? extends CommandHandler<T, S>> commandHandlers = aggregateDefinition.getCommandHandlers();
+        for(CommandHandler<T, S> commandHandler: commandHandlers){
+            Class<T> commandClass = commandHandler.getCommandClass();
             receiveBuilder.match(commandClass, command -> {
                 final Event event = commandHandler.handle(command, state);
 

@@ -4,7 +4,7 @@ import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
 
 public interface CommandHandler<T extends Command, S extends AggregateState>{
-    Event handle(T event, S state);
+    Event handle(T cmd, S state);
 
     Class<S> getStateClass();
 

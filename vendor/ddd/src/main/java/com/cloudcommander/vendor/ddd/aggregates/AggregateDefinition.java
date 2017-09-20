@@ -10,15 +10,15 @@ import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 
 import java.util.List;
 
-public interface AggregateDefinition {
+public interface AggregateDefinition<T extends Command, S extends AggregateState> {
 
     String getName();
 
     BoundedContextDefinition getBoundedContextDefinition();
 
-    AggregateStateFactory<AggregateState> getStateFactory();
+    AggregateStateFactory<S> getStateFactory();
 
-    List<CommandHandler<Command, AggregateState>> getCommandHandlers();
+    List<? extends CommandHandler<T, S>> getCommandHandlers();
 
     List<EventHandler<Event, AggregateState>> getEventHandlers();
 }
