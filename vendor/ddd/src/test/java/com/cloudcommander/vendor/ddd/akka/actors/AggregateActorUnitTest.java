@@ -15,6 +15,11 @@ import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
 import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
 import com.cloudcommander.vendor.ddd.aggregates.states.AggregateState;
 import com.cloudcommander.vendor.ddd.aggregates.states.AggregateStateFactory;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.handlers.IncrementCommandHandler;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.events.CounterValueChangedEvent;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.events.handers.CounterValueChangedEventHandler;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterAggregateStateFactory;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
 import org.junit.AfterClass;
@@ -154,112 +159,6 @@ public class AggregateActorUnitTest{
         @Override
         public AggregateState create() {
             return new TestAggregateState();
-        }
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Counter Aggregate classes
-    ///////////////////////////////////////////////////////////////////////////
-    private static class CounterAggregateStateFactory implements AggregateStateFactory<CounterState>{
-
-        @Override
-        public CounterState create() {
-            return new CounterState();
-        }
-    }
-
-    private static class CounterState implements AggregateState{
-
-        private long value = 0;
-
-        public CounterState(){
-
-        }
-
-        public long getValue() {
-            return value;
-        }
-
-        public void setValue(long value) {
-            this.value = value;
-        }
-    }
-
-    private static class IncrementCommand implements Command{
-
-        private UUID uuid;
-
-        public IncrementCommand(UUID uuid) {
-            this.uuid = uuid;
-        }
-
-        @Override
-        public Object getTargetId() {
-            return uuid;
-        }
-
-        public UUID getUuid() {
-            return uuid;
-        }
-    }
-
-    private static class CounterValueChangedEvent implements Event{
-        private UUID counterUuid;
-
-        private long newValue;
-
-        public CounterValueChangedEvent(UUID counterUuid, long newValue) {
-            this.counterUuid = counterUuid;
-            this.newValue = newValue;
-        }
-
-        public UUID getCounterUuid() {
-            return counterUuid;
-        }
-
-        public long getNewValue() {
-            return newValue;
-        }
-    }
-
-    private static class IncrementCommandHandler implements CommandHandler<IncrementCommand, CounterState> {
-
-        @Override
-        public Event handle(IncrementCommand cmd, CounterState state) {
-            UUID uuid = cmd.getUuid();
-            long newValue = state.getValue() + 1;
-
-            return new CounterValueChangedEvent(uuid, newValue);
-        }
-
-        @Override
-        public Class<CounterState> getStateClass() {
-            return CounterState.class;
-        }
-
-        @Override
-        public Class<IncrementCommand> getCommandClass() {
-            return IncrementCommand.class;
-        }
-    }
-
-    private static class CounterValueChangedEventHandler implements EventHandler<CounterValueChangedEvent, CounterState>{
-
-        @Override
-        public void handle(CounterValueChangedEvent event, CounterState state) {
-            long newValue = event.getNewValue();
-            state.setValue(newValue);
-        }
-
-        @Override
-        public Class<CounterState> getStateClass() {
-            return CounterState.class;
-        }
-
-        @Override
-        public Class<CounterValueChangedEvent> getEventClass() {
-            return CounterValueChangedEvent.class;
         }
     }
 }
