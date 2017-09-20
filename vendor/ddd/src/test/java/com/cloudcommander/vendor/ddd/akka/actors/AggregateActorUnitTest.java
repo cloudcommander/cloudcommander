@@ -35,7 +35,8 @@ import java.util.UUID;
 @RunWith(JUnit4.class)
 public class AggregateActorUnitTest{
 
-    private BoundedContextDefinition boundedContextDefinition = new DefaultBoundedContextDefinition("Users");
+    private StateFactory stateFactory = new CounterStateFactory();
+    private BoundedContextDefinition counterBoundedContextDefinition = new DefaultBoundedContextDefinition("Counter");
 
     private static ActorSystem system;
 
@@ -53,14 +54,13 @@ public class AggregateActorUnitTest{
     @Test
     public void testNonMappedCommand(){
         new TestKit(system) {{
-            String aggregateName = "User";
-            StateFactory stateFactory = new TestStateFactory();
-            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition(aggregateName, boundedContextDefinition, stateFactory, Collections.emptyList(), Collections.emptyList());
+            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, Collections.emptyList(), Collections.emptyList());
 
             final ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition));
             final ActorRef probe = getRef();
 
-            aggregateRef.tell(new TestCommand1("123"), probe);
+            UUID uuid = UUID.randomUUID();
+            aggregateRef.tell(new IncrementCommand(uuid), probe);
             expectMsgClass(UnhandledCommandResponse.class);
         }};
     }
@@ -68,13 +68,9 @@ public class AggregateActorUnitTest{
     @Test
     public void testCounterAggregate(){
         new TestKit(system) {{
-            String aggregateName = "Counter";
-            StateFactory stateFactory = new CounterStateFactory();
-            BoundedContextDefinition counterBoundedContextDefinition = new DefaultBoundedContextDefinition("Counter");
-
             List<CommandHandler<? extends Command, ? extends State>> commandHandlers = Collections.singletonList(new IncrementCommandHandler());
             List<EventHandler<? extends Event, ? extends State>> eventHandlers = Collections.singletonList(new ValueChangedEventHandler());
-            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition(aggregateName, counterBoundedContextDefinition, stateFactory, commandHandlers, eventHandlers);
+            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, commandHandlers, eventHandlers);
 
             ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition), "testCounter");
             final ActorRef probe = getRef();
@@ -128,37 +124,5 @@ public class AggregateActorUnitTest{
                 Assert.assertEquals(3, valueChangedEvent.getNewValue());
             }
         }};
-    }
-
-    private static class TestCommand1 implements Command{
-
-        private String id;
-
-        public TestCommand1(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        @Override
-        public Object getTargetId() {
-            return "";
-        }
-    }
-
-    private static class TestState implements State {
-        public TestState(){
-
-        }
-    }
-
-    private static class TestStateFactory implements StateFactory {
-
-        @Override
-        public State create() {
-            return new TestState();
-        }
     }
 }
