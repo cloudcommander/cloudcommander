@@ -4,6 +4,7 @@ import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
+import akka.persistence.journal.Tagged;
 import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
@@ -16,12 +17,11 @@ import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
+import com.google.common.collect.ImmutableSortedSet;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AggregateActor<T extends Command, U extends Event, V extends Query, W extends Result, S extends State> extends AbstractPersistentActor {
 
@@ -31,10 +31,22 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
 
     private S state;
 
+    Set<String> tags;
+
     public AggregateActor(final AggregateDefinition aggregateDefinition){
         this.aggregateDefinition = aggregateDefinition;
 
         setInitialState();
+        createAggregateTags(aggregateDefinition);
+    }
+
+    private void createAggregateTags(final AggregateDefinition aggregateDefinition) {
+        tags = new HashSet<>();
+
+        String boundedContextName = aggregateDefinition.getBoundedContextDefinition().getName();
+        String aggregateTag = boundedContextName + "-" + aggregateDefinition.getName();
+        tags.add(boundedContextName);
+        tags.add(aggregateTag);
     }
 
     protected void setInitialState(){
@@ -89,8 +101,9 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
             Class<T> commandClass = commandHandler.getCommandClass();
             receiveBuilder.match(commandClass, command -> {
                 final U event = commandHandler.handle(command, state);
+                Tagged taggedEvent = new Tagged(event, tags);
 
-                persist(event, param -> {
+                persist(taggedEvent, param -> {
                     Class<? extends Event> eventClass = event.getClass();
                     EventHandler<U, S> eventHandler = eventHandlerMap.get(eventClass);
 
