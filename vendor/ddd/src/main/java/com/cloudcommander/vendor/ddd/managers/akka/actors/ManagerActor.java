@@ -1,5 +1,6 @@
 package com.cloudcommander.vendor.ddd.managers.akka.actors;
 
+import akka.actor.Props;
 import akka.persistence.AbstractPersistentActor;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
@@ -51,7 +52,9 @@ public class ManagerActor <T extends Event, U extends ManagerLog, S extends Stat
         Receive receive = stateReceivers.get(stateName);
 
         if(receive == null) {
-            receive = createReceiveStrategy.createStateReceive(stateName, () -> this.state, this::persist, receiveRecover);
+            receive = createReceiveStrategy.createStateReceive(stateName, () -> this.state, this::persist, receiveRecover, msgToSend -> {
+                getSender().tell(msgToSend, getSelf());
+            });
         }
 
         return receive;
@@ -63,5 +66,9 @@ public class ManagerActor <T extends Event, U extends ManagerLog, S extends Stat
         BoundedContextDefinition boundedContextDefinition = managerDefinition.getBoundedContextDefinition();
 
         return boundedContextDefinition.getName() + '-' + managerName + '-' + getSelf().path().name() + "-Mgr";
+    }
+
+    public static Props props(final ManagerDefinition<Event, ManagerLog, com.cloudcommander.vendor.ddd.managers.states.State> managerDefinition, CreateManagerActorReceiveStrategy<ManagerLog, com.cloudcommander.vendor.ddd.managers.states.State> createManagerActorReceiveStrategy) {
+        return Props.create(ManagerActor.class, () -> new ManagerActor<Event, ManagerLog, com.cloudcommander.vendor.ddd.managers.states.State>(managerDefinition, createManagerActorReceiveStrategy));
     }
 }

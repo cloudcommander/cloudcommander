@@ -1,7 +1,9 @@
 package com.cloudcommander.vendor.ddd.managers.akka.actors.strategies;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
 import akka.japi.Procedure;
+import akka.japi.pf.FI;
 import akka.japi.pf.ReceiveBuilder;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.managers.ManagerDefinition;
@@ -9,6 +11,7 @@ import com.cloudcommander.vendor.ddd.managers.events.handlers.EventHandler;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.StateEventHandlers;
 import com.cloudcommander.vendor.ddd.managers.logs.ManagerLog;
 import com.cloudcommander.vendor.ddd.managers.logs.handlers.ManagerLogHandler;
+import com.cloudcommander.vendor.ddd.managers.responses.UnhandledEventResponse;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
 import java.util.HashMap;
@@ -56,11 +59,13 @@ public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends
     }
 
     @Override
-    public AbstractActor.Receive createStateReceive(String stateName, Supplier<S> stateSupplier, BiConsumer<U, Procedure<U>> persistFn, AbstractActor.Receive receiveRecover){
+    public AbstractActor.Receive createStateReceive(String stateName, Supplier<S> stateSupplier, BiConsumer<U, Procedure<U>> persistFn, AbstractActor.Receive receiveRecover, final FI.UnitApply<Object> sendFunc){
         final StateEventHandlers<T, U, S> stateEventHandler = getStateEventHandler(stateName);
 
         final List<EventHandler<T, U, S>> eventHandlers = stateEventHandler.getEventHandlers();
         final ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
+
+        //Dynamic handlers
         for(EventHandler<T, U, S> eventHandler: eventHandlers){
             final Class<T> eventClass = eventHandler.getEventClass();
             receiveBuilder.match(eventClass, evt -> {
@@ -72,13 +77,27 @@ public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends
                 });
             });
         }
+
+        //Fallback
+        receiveBuilder.matchAny(event -> {
+            UnhandledEventResponse unhandledEventResponse = new UnhandledEventResponse(event.getClass());
+
+            sendFunc.apply(unhandledEventResponse);
+        });
+
         return receiveBuilder.build();
     }
 
     protected StateEventHandlers<T, U, S> getStateEventHandler(String stateName){
         StateEventHandlers<T, U, S> stateEventHandler = stateEventHandlersMap.get(stateName);
 
-        //TODO tello exception
+        if(stateEventHandler == null){
+            final String boundedContextName = managerDefinition.getBoundedContextDefinition().getName();
+            final String managerName = managerDefinition.getName();
+
+            throw new IllegalArgumentException("State with name \"" + stateName + "\" not defined for the manager \""+boundedContextName + "-"
+                    + managerName + "\"");
+        }
 
         return stateEventHandler;
     }

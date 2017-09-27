@@ -22,7 +22,7 @@ public class DefaultStateEventHandlers<T extends Event, U extends ManagerLog, S 
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
