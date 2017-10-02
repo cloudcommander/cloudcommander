@@ -58,7 +58,7 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
         for(EventHandler<U, S> eventHandler: eventHandlers){
             Class<U> eventClass = eventHandler.getEventClass();
             receiveBuilder.match(eventClass, event -> {
-                eventHandler.handle(event, state);
+                state = eventHandler.handle(event, state);
             });
         }
 

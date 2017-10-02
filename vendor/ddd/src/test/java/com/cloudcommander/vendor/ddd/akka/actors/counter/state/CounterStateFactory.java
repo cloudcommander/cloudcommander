@@ -5,6 +5,9 @@ import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 public class CounterStateFactory implements StateFactory<CounterState> {
     @Override
     public CounterState create() {
-        return new CounterState();
+        return ImmutableCounterState
+                .builder()
+                .value(0)
+                .build();
     }
 }
