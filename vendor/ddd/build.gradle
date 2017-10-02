@@ -1,7 +1,23 @@
 group 'com.cloudcommander.vendor.ddd'
 version '1.0-SNAPSHOT'
 
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.ltgt.gradle:gradle-apt-plugin:0.12"
+    }
+}
+
+apply plugin: "net.ltgt.apt"
 apply plugin: 'com.cloudcommander.module'
+
+repositories {
+    mavenCentral()
+}
 
 dependencies{
     compile project(':vendor:module')
@@ -11,9 +27,18 @@ dependencies{
     compile 'org.iq80.leveldb:leveldb:0.7'
     compile 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
 
+    apt "org.immutables:value:2.5.5" // for annotation processor
+    compile "org.immutables:value:2.5.5:annotations" // annotation-only artifact
+
     testCompile 'junit:junit:4.12'
     testCompile 'com.typesafe.akka:akka-testkit_2.12:2.5.4'
     testCompile 'com.github.dnvriend:akka-persistence-inmemory_2.12:2.5.1.1'
     testCompile group: 'org.scala-lang', name: 'scala-library', version: '2.12.3'
 
+    testApt "org.immutables:value:2.5.5" // for annotation processor
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }

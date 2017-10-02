@@ -2,6 +2,7 @@ package com.cloudcommander.vendor.ddd.akka.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.ImmutableGetValueQuery;
 
 import akka.actor.PoisonPill;
 import akka.actor.Terminated;
@@ -26,6 +27,7 @@ import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.handlers.GetVal
 import com.cloudcommander.vendor.ddd.akka.actors.counter.results.ValueResult;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterStateFactory;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.ImmutableIncrementCommand;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
 import org.junit.AfterClass;
@@ -66,7 +68,11 @@ public class AggregateActorUnitTest{
             final ActorRef probe = getRef();
 
             UUID uuid = UUID.randomUUID();
-            aggregateRef.tell(new IncrementCommand(uuid), probe);
+            IncrementCommand incrementCommand = ImmutableIncrementCommand
+                    .builder()
+                    .aggregateId(uuid)
+                    .build();
+            aggregateRef.tell(incrementCommand, probe);
             expectMsgClass(UnhandledCommandResponse.class);
         }};
     }
@@ -85,7 +91,11 @@ public class AggregateActorUnitTest{
             UUID uuid = UUID.randomUUID();
 
             {
-                aggregateRef.tell(new GetValueQuery(uuid), probe);
+                GetValueQuery getValueQuery = ImmutableGetValueQuery
+                        .builder()
+                        .aggregateId(uuid)
+                        .build();
+                aggregateRef.tell(getValueQuery, probe);
 
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
@@ -97,7 +107,11 @@ public class AggregateActorUnitTest{
                 Assert.assertEquals(0, valueResult.getValue());
             }
             {
-                aggregateRef.tell(new IncrementCommand(uuid), probe);
+                IncrementCommand incrementCommand = ImmutableIncrementCommand
+                        .builder()
+                        .aggregateId(uuid)
+                        .build();
+                aggregateRef.tell(incrementCommand, probe);
 
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
@@ -106,12 +120,16 @@ public class AggregateActorUnitTest{
                 Assert.assertTrue(firstMessage instanceof ValueChangedEvent);
 
                 ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
-                Assert.assertEquals(uuid, valueChangedEvent.getCounterUuid());
+                Assert.assertEquals(uuid, valueChangedEvent.getAggregateId());
                 Assert.assertEquals(1, valueChangedEvent.getNewValue());
             }
 
             {
-                aggregateRef.tell(new IncrementCommand(uuid), probe);
+                IncrementCommand incrementCommand = ImmutableIncrementCommand
+                        .builder()
+                        .aggregateId(uuid)
+                        .build();
+                aggregateRef.tell(incrementCommand, probe);
 
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
@@ -120,7 +138,7 @@ public class AggregateActorUnitTest{
                 Assert.assertTrue(firstMessage instanceof ValueChangedEvent);
 
                 ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
-                Assert.assertEquals(uuid, valueChangedEvent.getCounterUuid());
+                Assert.assertEquals(uuid, valueChangedEvent.getAggregateId());
                 Assert.assertEquals(2, valueChangedEvent.getNewValue());
             }
 
@@ -130,7 +148,12 @@ public class AggregateActorUnitTest{
                 expectMsgClass(Terminated.class);
 
                 aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition), "testCounter");
-                aggregateRef.tell(new IncrementCommand(uuid), probe);
+
+                IncrementCommand incrementCommand = ImmutableIncrementCommand
+                        .builder()
+                        .aggregateId(uuid)
+                        .build();
+                aggregateRef.tell(incrementCommand, probe);
 
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
@@ -139,12 +162,16 @@ public class AggregateActorUnitTest{
                 Assert.assertTrue(firstMessage instanceof ValueChangedEvent);
 
                 ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
-                Assert.assertEquals(uuid, valueChangedEvent.getCounterUuid());
+                Assert.assertEquals(uuid, valueChangedEvent.getAggregateId());
                 Assert.assertEquals(3, valueChangedEvent.getNewValue());
             }
 
             {
-                aggregateRef.tell(new GetValueQuery(uuid), probe);
+                GetValueQuery getValueQuery = ImmutableGetValueQuery
+                        .builder()
+                        .aggregateId(uuid)
+                        .build();
+                aggregateRef.tell(getValueQuery, probe);
 
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());

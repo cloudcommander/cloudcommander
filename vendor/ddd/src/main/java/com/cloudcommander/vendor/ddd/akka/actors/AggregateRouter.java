@@ -27,7 +27,7 @@ public class AggregateRouter extends AbstractActor {
     }
 
     protected void handleCommand(Command command){
-        Object targetId = command.getTargetId();
+        Object targetId = command.getAggregateId();
 
         ActorRef aggregateRef = aggregateRefs.get(targetId);
         if(aggregateRef == null){

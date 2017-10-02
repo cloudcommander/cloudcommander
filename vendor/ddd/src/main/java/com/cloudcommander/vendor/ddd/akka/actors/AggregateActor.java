@@ -1,6 +1,7 @@
 package com.cloudcommander.vendor.ddd.akka.actors;
 
 import akka.actor.Props;
+import akka.japi.Procedure;
 import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
@@ -33,11 +34,35 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
 
     Set<String> tags;
 
+    private Receive receiveRecover;
+
     public AggregateActor(final AggregateDefinition aggregateDefinition){
         this.aggregateDefinition = aggregateDefinition;
 
         setInitialState();
         createAggregateTags(aggregateDefinition);
+
+        setupReceiveRecover();
+    }
+
+    private void setupReceiveRecover() {
+        ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
+
+        //Restore from snapshots
+        receiveBuilder.match(SnapshotOffer.class, snapshotOffer -> {
+            state = (S)snapshotOffer.snapshot();
+        });
+
+        //Handle defined events
+        List<? extends EventHandler<U, S>> eventHandlers = aggregateDefinition.getEventHandlers();
+        for(EventHandler<U, S> eventHandler: eventHandlers){
+            Class<U> eventClass = eventHandler.getEventClass();
+            receiveBuilder.match(eventClass, event -> {
+                eventHandler.handle(event, state);
+            });
+        }
+
+        receiveRecover = receiveBuilder.build();
     }
 
     private void createAggregateTags(final AggregateDefinition aggregateDefinition) {
@@ -56,28 +81,7 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
 
     @Override
     public Receive createReceiveRecover() {
-        ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
-
-        //Restore from snapshots
-        receiveBuilder.match(SnapshotOffer.class, snapshotOffer -> {
-            state = (S)snapshotOffer.snapshot();
-        });
-
-        //Handle defined events
-        List<? extends EventHandler<U, S>> eventHandlers = aggregateDefinition.getEventHandlers();
-        for(EventHandler<U, S> eventHandler: eventHandlers){
-            Class<U> eventClass = eventHandler.getEventClass();
-            receiveBuilder.match(eventClass, event -> {
-                eventHandler.handle(event, state);
-            });
-        }
-
-        return receiveBuilder.build();
-    }
-
-    @Override
-    public void onPersistRejected(Throwable cause, Object event, long seqNr) {
-        super.onPersistRejected(cause, event, seqNr);
+        return receiveRecover;
     }
 
     @Override
@@ -104,12 +108,7 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
                 Tagged taggedEvent = new Tagged(event, tags);
 
                 persist(taggedEvent, param -> {
-                    Class<? extends Event> eventClass = event.getClass();
-                    EventHandler<U, S> eventHandler = eventHandlerMap.get(eventClass);
-
-                    if(eventHandler != null){
-                        eventHandler.handle(event, state);
-                    }
+                   receiveRecover.onMessage().apply(event);
 
                     getSender().tell(event, getSelf());
                 });

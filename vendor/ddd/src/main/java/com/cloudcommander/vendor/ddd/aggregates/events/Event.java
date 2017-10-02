@@ -1,6 +1,6 @@
 package com.cloudcommander.vendor.ddd.aggregates.events;
 
-import java.io.Serializable;
+import com.cloudcommander.vendor.ddd.aggregates.Message;
 
-public interface Event extends Serializable {
+public interface Event<T> extends Message<T> {
 }

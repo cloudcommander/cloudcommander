@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ImmutableValueChangedEvent;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,7 +64,12 @@ public class ManagerActorUnitTest {
             final ActorRef probe = getRef();
 
             UUID uuid = UUID.randomUUID();
-            aggregateRef.tell(new ValueChangedEvent(uuid, 5), probe);
+            ValueChangedEvent event = ImmutableValueChangedEvent.builder()
+                    .aggregateId(uuid)
+                    .newValue(5)
+                    .build();
+
+            aggregateRef.tell(event, probe);
             expectMsgClass(UnhandledEventResponse.class);
         }};
     }

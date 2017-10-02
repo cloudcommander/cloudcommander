@@ -1,5 +1,8 @@
 package com.cloudcommander.vendor.ddd.aggregates;
 
-public interface Message {
-    Object getTargetId();
+import java.io.Serializable;
+
+public interface Message <T> extends Serializable{
+
+    T getAggregateId();
 }

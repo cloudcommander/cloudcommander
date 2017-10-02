@@ -1,6 +1,5 @@
 package com.cloudcommander.vendor.ddd.aggregates.results;
 
-import java.io.Serializable;
-
-public interface Result extends Serializable{
+import com.cloudcommander.vendor.ddd.aggregates.Message;
+public interface Result<T> extends Message<T>{
 }

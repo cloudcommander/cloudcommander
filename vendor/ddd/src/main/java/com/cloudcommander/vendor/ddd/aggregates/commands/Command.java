@@ -2,7 +2,5 @@ package com.cloudcommander.vendor.ddd.aggregates.commands;
 
 import com.cloudcommander.vendor.ddd.aggregates.Message;
 
-import java.io.Serializable;
-
-public interface Command extends Message, Serializable{
+public interface Command<T> extends Message<T>{
 }
