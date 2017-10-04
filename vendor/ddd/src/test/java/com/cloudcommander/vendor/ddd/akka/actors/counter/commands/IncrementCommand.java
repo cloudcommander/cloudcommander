@@ -1,11 +1,19 @@
 package com.cloudcommander.vendor.ddd.akka.actors.counter.commands;
 
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
-import org.immutables.value.Value;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
 import java.util.UUID;
 
-@Value.Immutable
-public interface IncrementCommand extends Command<UUID> {
-
+@EqualsAndHashCode(callSuper=true)
+@NonFinal
+@Value
+public class IncrementCommand extends Command<UUID> {
+    @Builder
+    public IncrementCommand(UUID aggregateId){
+        super(aggregateId);
+    }
 }

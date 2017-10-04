@@ -4,7 +4,6 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterState;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ImmutableValueChangedEvent;
 
 import java.util.UUID;
 
@@ -14,13 +13,11 @@ public class IncrementCommandHandler implements CommandHandler<IncrementCommand,
         UUID uuid = cmd.getAggregateId();
         long newValue = state.getValue() + 1;
 
-        ValueChangedEvent valueChangedEvent = ImmutableValueChangedEvent
+        return ValueChangedEvent
                 .builder()
                 .aggregateId(uuid)
                 .newValue(newValue)
                 .build();
-
-        return valueChangedEvent;
     }
 
     @Override

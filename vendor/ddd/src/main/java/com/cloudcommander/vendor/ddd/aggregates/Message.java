@@ -1,8 +1,13 @@
 package com.cloudcommander.vendor.ddd.aggregates;
 
+import lombok.Value;
+import lombok.experimental.NonFinal;
+
 import java.io.Serializable;
 
-public interface Message <T> extends Serializable{
+@NonFinal
+@Value
+public class Message <T> implements Serializable{
 
-    T getAggregateId();
+    private T aggregateId;
 }

@@ -3,12 +3,7 @@ package com.cloudcommander.vendor.ddd.managers.akka.actors;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
-import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
-import com.cloudcommander.vendor.ddd.aggregates.DefaultAggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
-import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
-import com.cloudcommander.vendor.ddd.akka.actors.AggregateActor;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
@@ -26,9 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ImmutableValueChangedEvent;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -64,7 +57,7 @@ public class ManagerActorUnitTest {
             final ActorRef probe = getRef();
 
             UUID uuid = UUID.randomUUID();
-            ValueChangedEvent event = ImmutableValueChangedEvent.builder()
+            ValueChangedEvent event = ValueChangedEvent.builder()
                     .aggregateId(uuid)
                     .newValue(5)
                     .build();

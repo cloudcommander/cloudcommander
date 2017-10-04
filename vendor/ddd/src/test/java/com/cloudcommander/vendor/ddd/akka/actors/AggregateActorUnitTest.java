@@ -2,7 +2,6 @@ package com.cloudcommander.vendor.ddd.akka.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.ImmutableGetValueQuery;
 
 import akka.actor.PoisonPill;
 import akka.actor.Terminated;
@@ -27,7 +26,6 @@ import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.handlers.GetVal
 import com.cloudcommander.vendor.ddd.akka.actors.counter.results.ValueResult;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterStateFactory;
 import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.ImmutableIncrementCommand;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
 import org.junit.AfterClass;
@@ -68,7 +66,7 @@ public class AggregateActorUnitTest{
             final ActorRef probe = getRef();
 
             UUID uuid = UUID.randomUUID();
-            IncrementCommand incrementCommand = ImmutableIncrementCommand
+            IncrementCommand incrementCommand = IncrementCommand
                     .builder()
                     .aggregateId(uuid)
                     .build();
@@ -91,7 +89,7 @@ public class AggregateActorUnitTest{
             UUID uuid = UUID.randomUUID();
 
             {
-                GetValueQuery getValueQuery = ImmutableGetValueQuery
+                GetValueQuery getValueQuery = GetValueQuery
                         .builder()
                         .aggregateId(uuid)
                         .build();
@@ -107,7 +105,7 @@ public class AggregateActorUnitTest{
                 Assert.assertEquals(0, valueResult.getValue());
             }
             {
-                IncrementCommand incrementCommand = ImmutableIncrementCommand
+                IncrementCommand incrementCommand = IncrementCommand
                         .builder()
                         .aggregateId(uuid)
                         .build();
@@ -125,7 +123,7 @@ public class AggregateActorUnitTest{
             }
 
             {
-                IncrementCommand incrementCommand = ImmutableIncrementCommand
+                IncrementCommand incrementCommand = IncrementCommand
                         .builder()
                         .aggregateId(uuid)
                         .build();
@@ -149,7 +147,7 @@ public class AggregateActorUnitTest{
 
                 aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition), "testCounter");
 
-                IncrementCommand incrementCommand = ImmutableIncrementCommand
+                IncrementCommand incrementCommand = IncrementCommand
                         .builder()
                         .aggregateId(uuid)
                         .build();
@@ -167,7 +165,7 @@ public class AggregateActorUnitTest{
             }
 
             {
-                GetValueQuery getValueQuery = ImmutableGetValueQuery
+                GetValueQuery getValueQuery = GetValueQuery
                         .builder()
                         .aggregateId(uuid)
                         .build();

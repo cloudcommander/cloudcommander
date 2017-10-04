@@ -4,9 +4,17 @@ import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
 
 import java.util.UUID;
 
-import org.immutables.value.Value;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
-@Value.Immutable
-public interface GetValueQuery extends Query<UUID>{
-
+@EqualsAndHashCode(callSuper=true)
+@NonFinal
+@Value
+public class GetValueQuery extends Query<UUID>{
+    @Builder
+    public GetValueQuery(UUID aggregateId){
+        super(aggregateId);
+    }
 }
