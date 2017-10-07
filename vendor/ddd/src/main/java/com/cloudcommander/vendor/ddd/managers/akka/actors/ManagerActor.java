@@ -6,7 +6,7 @@ import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.managers.ManagerDefinition;
 import com.cloudcommander.vendor.ddd.managers.akka.actors.strategies.CreateManagerActorReceiveStrategy;
-import com.cloudcommander.vendor.ddd.managers.logs.ManagerLog;
+import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by Adrian Tello on 23/09/2017.
  */
-public class ManagerActor <T extends Event, U extends ManagerLog, S extends State> extends AbstractPersistentActor {
+public class ManagerActor <T extends Event, U extends ManagerEvent, S extends State> extends AbstractPersistentActor {
 
     private ManagerDefinition<T, U, S> managerDefinition;
 
@@ -68,7 +68,7 @@ public class ManagerActor <T extends Event, U extends ManagerLog, S extends Stat
         return boundedContextDefinition.getName() + '-' + managerName + '-' + getSelf().path().name() + "-Mgr";
     }
 
-    public static Props props(final ManagerDefinition<Event, ManagerLog, com.cloudcommander.vendor.ddd.managers.states.State> managerDefinition, CreateManagerActorReceiveStrategy<ManagerLog, com.cloudcommander.vendor.ddd.managers.states.State> createManagerActorReceiveStrategy) {
-        return Props.create(ManagerActor.class, () -> new ManagerActor<Event, ManagerLog, com.cloudcommander.vendor.ddd.managers.states.State>(managerDefinition, createManagerActorReceiveStrategy));
+    public static Props props(final ManagerDefinition<Event, ManagerEvent, com.cloudcommander.vendor.ddd.managers.states.State> managerDefinition, CreateManagerActorReceiveStrategy<ManagerEvent, com.cloudcommander.vendor.ddd.managers.states.State> createManagerActorReceiveStrategy) {
+        return Props.create(ManagerActor.class, () -> new ManagerActor<Event, ManagerEvent, com.cloudcommander.vendor.ddd.managers.states.State>(managerDefinition, createManagerActorReceiveStrategy));
     }
 }

@@ -13,7 +13,7 @@ import com.cloudcommander.vendor.ddd.managers.akka.actors.strategies.CreateManag
 import com.cloudcommander.vendor.ddd.managers.akka.actors.strategies.DefaultCreateManagerActorReceiveStrategy;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.DefaultStateEventHandlers;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.StateEventHandlers;
-import com.cloudcommander.vendor.ddd.managers.logs.ManagerLog;
+import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
 import com.cloudcommander.vendor.ddd.managers.responses.UnhandledEventResponse;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 import org.junit.AfterClass;
@@ -49,9 +49,9 @@ public class ManagerActorUnitTest {
     @Test
     public void testNonMappedEvent(){
         new TestKit(system) {{
-            StateEventHandlers<Event, ManagerLog, State> stateEventHandlers = new DefaultStateEventHandlers<>("counting", Collections.emptyList());
-            ManagerDefinition<Event, ManagerLog, State> managerDefinition = new DefaultManagerDefinition("CounterNotificationMgr", boundedContextDefinition, "counting", Collections.singletonList(stateEventHandlers), Collections.emptyList());
-            CreateManagerActorReceiveStrategy<ManagerLog, State> createReceiveStrategy = new DefaultCreateManagerActorReceiveStrategy<>(managerDefinition);
+            StateEventHandlers<Event, ManagerEvent, State> stateEventHandlers = new DefaultStateEventHandlers<>("counting", Collections.emptyList());
+            ManagerDefinition<Event, ManagerEvent, State> managerDefinition = new DefaultManagerDefinition("CounterNotificationMgr", boundedContextDefinition, "counting", Collections.singletonList(stateEventHandlers), Collections.emptyList());
+            CreateManagerActorReceiveStrategy<ManagerEvent, State> createReceiveStrategy = new DefaultCreateManagerActorReceiveStrategy<>(managerDefinition);
 
             final ActorRef aggregateRef = system.actorOf(ManagerActor.props(managerDefinition, createReceiveStrategy));
             final ActorRef probe = getRef();

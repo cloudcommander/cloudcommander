@@ -1,7 +1,6 @@
 package com.cloudcommander.vendor.ddd.managers.akka.actors.strategies;
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
 import akka.japi.Procedure;
 import akka.japi.pf.FI;
 import akka.japi.pf.ReceiveBuilder;
@@ -9,8 +8,8 @@ import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.managers.ManagerDefinition;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.EventHandler;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.StateEventHandlers;
-import com.cloudcommander.vendor.ddd.managers.logs.ManagerLog;
-import com.cloudcommander.vendor.ddd.managers.logs.handlers.ManagerLogHandler;
+import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerlogs.handlers.ManagerEventHandler;
 import com.cloudcommander.vendor.ddd.managers.responses.UnhandledEventResponse;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
@@ -23,19 +22,19 @@ import java.util.function.Supplier;
 /**
  * Created by Adrian Tello on 27/09/2017.
  */
-public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends ManagerLog, S extends State> implements CreateManagerActorReceiveStrategy<U, S> {
+public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends ManagerEvent, S extends State> implements CreateManagerActorReceiveStrategy<U, S> {
 
     private final ManagerDefinition<T, U, S> managerDefinition;
 
     private final Map<String, StateEventHandlers<T, U, S>> stateEventHandlersMap;
 
-    private final Map<Class<U>, ManagerLogHandler<U, S>> managerLogHandlersMap;
+    private final Map<Class<U>, ManagerEventHandler<U, S>> managerEventHandlersMap;
 
     public DefaultCreateManagerActorReceiveStrategy(final ManagerDefinition<T, U, S> managerDefinition){
         this.managerDefinition = managerDefinition;
 
         stateEventHandlersMap = createStateEventHandlersMap(managerDefinition.getStateEventHandlers());
-        managerLogHandlersMap = createManagerLogHandlersMap(managerDefinition.getManagerLogHandlers());
+        managerEventHandlersMap = createManagerEventHandlersMap(managerDefinition.getManagerEventHandlers());
     }
 
     protected Map<String,StateEventHandlers<T, U, S>> createStateEventHandlersMap(List<? extends StateEventHandlers<T, U, S>> stateEventHandlers) {
@@ -48,14 +47,14 @@ public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends
         return stateEventHandlersMap;
     }
 
-    private Map<Class<U>, ManagerLogHandler<U, S>> createManagerLogHandlersMap(List<ManagerLogHandler<U, S>> managerLogHandlers) {
-        Map<Class<U>, ManagerLogHandler<U, S>> managerLogHandlersMap = new HashMap<>(managerLogHandlers.size());
-        for(ManagerLogHandler<U, S> managerLogHandler: managerLogHandlers){
-            Class<U> managerLogClass = managerLogHandler.getLogClass();
+    private Map<Class<U>, ManagerEventHandler<U, S>> createManagerEventHandlersMap(List<ManagerEventHandler<U, S>> managerEventHandlers) {
+        Map<Class<U>, ManagerEventHandler<U, S>> managerEventHandlersMap = new HashMap<>(managerEventHandlers.size());
+        for(ManagerEventHandler<U, S> managerEventHandler : managerEventHandlers){
+            Class<U> managerEventClass = managerEventHandler.getEventClass();
 
-            managerLogHandlersMap.put(managerLogClass, managerLogHandler);
+            managerEventHandlersMap.put(managerEventClass, managerEventHandler);
         }
-        return managerLogHandlersMap;
+        return managerEventHandlersMap;
     }
 
     @Override
@@ -70,9 +69,9 @@ public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends
             final Class<T> eventClass = eventHandler.getEventClass();
             receiveBuilder.match(eventClass, evt -> {
                 S state = stateSupplier.get();
-                U managerLog = eventHandler.handle(evt, state);
+                U managerEvent = eventHandler.handle(evt, state);
 
-                persistFn.accept(managerLog, mgrEvt -> {
+                persistFn.accept(managerEvent, mgrEvt -> {
                     receiveRecover.onMessage().apply(mgrEvt);
                 });
             });
@@ -104,15 +103,15 @@ public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends
 
     @Override
     public AbstractActor.Receive createReceiveRecover(Supplier<S> stateSupplier) {
-        List<ManagerLogHandler<U, S>> managerLogHandlers = managerDefinition.getManagerLogHandlers();
+        List<ManagerEventHandler<U, S>> managerEventHandlers = managerDefinition.getManagerEventHandlers();
 
         ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
-        for(ManagerLogHandler<U, S> managerLogHandler: managerLogHandlers){
-            Class<U> logClass = managerLogHandler.getLogClass();
-            receiveBuilder.match(logClass, log -> {
+        for(ManagerEventHandler<U, S> managerEventHandler : managerEventHandlers){
+            Class<U> eventClass = managerEventHandler.getEventClass();
+            receiveBuilder.match(eventClass, log -> {
                 S state = stateSupplier.get();
 
-                managerLogHandler.handle(log, state);
+                managerEventHandler.handle(log, state);
             });
         }
 
