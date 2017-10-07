@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.queries;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.queries;
 
 import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
 

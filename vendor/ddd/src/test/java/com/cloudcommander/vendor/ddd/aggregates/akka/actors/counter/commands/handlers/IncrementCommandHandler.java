@@ -1,9 +1,9 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.commands.handlers;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.commands.handlers;
 
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterState;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.commands.IncrementCommand;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.ValueChangedEvent;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterState;
 
 import java.util.UUID;
 

@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.managers.DefaultManagerDefinition;

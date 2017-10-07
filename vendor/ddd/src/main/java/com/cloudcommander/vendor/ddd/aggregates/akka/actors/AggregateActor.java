@@ -1,7 +1,6 @@
-package com.cloudcommander.vendor.ddd.akka.actors;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors;
 
 import akka.actor.Props;
-import akka.japi.Procedure;
 import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
@@ -18,7 +17,6 @@ import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
-import com.google.common.collect.ImmutableSortedSet;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 

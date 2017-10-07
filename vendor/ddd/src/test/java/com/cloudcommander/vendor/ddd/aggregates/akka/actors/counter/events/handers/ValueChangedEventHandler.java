@@ -1,8 +1,8 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.events.handers;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.handers;
 
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterState;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.ValueChangedEvent;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterState;
 
 public class ValueChangedEventHandler implements EventHandler<ValueChangedEvent, CounterState> {
     @Override

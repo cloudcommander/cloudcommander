@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.ddd.akka.actors;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -18,14 +18,14 @@ import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandRespon
 import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.handlers.IncrementCommandHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.ValueChangedEvent;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.events.handers.ValueChangedEventHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.GetValueQuery;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.handlers.GetValueQueryHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.results.ValueResult;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterStateFactory;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.commands.IncrementCommand;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.commands.handlers.IncrementCommandHandler;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.ValueChangedEvent;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.handers.ValueChangedEventHandler;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.queries.GetValueQuery;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.queries.handlers.GetValueQueryHandler;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.results.ValueResult;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterStateFactory;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.commands.IncrementCommand;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
 import org.junit.AfterClass;

@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.events;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events;
 
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import lombok.Builder;

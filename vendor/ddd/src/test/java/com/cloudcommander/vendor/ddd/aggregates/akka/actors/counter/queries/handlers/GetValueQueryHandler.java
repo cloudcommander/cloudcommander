@@ -1,9 +1,9 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.queries.handlers;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.queries.handlers;
 
 import com.cloudcommander.vendor.ddd.aggregates.queries.QueryHandler;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.queries.GetValueQuery;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.results.ValueResult;
-import com.cloudcommander.vendor.ddd.akka.actors.counter.state.CounterState;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.queries.GetValueQuery;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.results.ValueResult;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterState;
 
 public class GetValueQueryHandler implements QueryHandler<GetValueQuery, ValueResult, CounterState>{
     @Override

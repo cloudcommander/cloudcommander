@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.ddd.akka.actors;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;

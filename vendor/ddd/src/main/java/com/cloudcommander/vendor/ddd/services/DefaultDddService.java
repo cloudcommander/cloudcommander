@@ -6,7 +6,7 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
-import com.cloudcommander.vendor.ddd.akka.actors.AggregateRouter;
+import com.cloudcommander.vendor.ddd.aggregates.akka.actors.AggregateRouter;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.Future;
 import java.util.concurrent.CompletionStage;

@@ -1,4 +1,4 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.state;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state;
 
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import lombok.Builder;

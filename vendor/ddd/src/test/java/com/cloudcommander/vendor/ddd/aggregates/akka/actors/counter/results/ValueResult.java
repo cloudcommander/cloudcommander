@@ -1,11 +1,10 @@
-package com.cloudcommander.vendor.ddd.akka.actors.counter.results;
+package com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.results;
 
 import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import lombok.experimental.Wither;
 
 import java.util.UUID;
 
