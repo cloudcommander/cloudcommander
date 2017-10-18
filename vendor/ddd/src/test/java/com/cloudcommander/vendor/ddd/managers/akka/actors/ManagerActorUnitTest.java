@@ -11,10 +11,12 @@ import com.cloudcommander.vendor.ddd.managers.DefaultManagerDefinition;
 import com.cloudcommander.vendor.ddd.managers.ManagerDefinition;
 import com.cloudcommander.vendor.ddd.managers.akka.actors.strategies.CreateManagerActorReceiveStrategy;
 import com.cloudcommander.vendor.ddd.managers.akka.actors.strategies.DefaultCreateManagerActorReceiveStrategy;
+import com.cloudcommander.vendor.ddd.managers.counter.state.CounterManagerStateFactory;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.DefaultStateEventHandlers;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.StateEventHandlers;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEventEnvelope;
 import com.cloudcommander.vendor.ddd.managers.responses.UnhandledEventResponse;
+import com.cloudcommander.vendor.ddd.managers.states.ManagerStateFactory;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -49,9 +51,10 @@ public class ManagerActorUnitTest {
     @Test
     public void testNonMappedEvent(){
         new TestKit(system) {{
-            StateEventHandlers<Event, ManagerEvent, State> stateEventHandlers = new DefaultStateEventHandlers<>("counting", Collections.emptyList());
-            ManagerDefinition<Event, ManagerEvent, State> managerDefinition = new DefaultManagerDefinition("CounterNotificationMgr", boundedContextDefinition, "counting", Collections.singletonList(stateEventHandlers), Collections.emptyList());
-            CreateManagerActorReceiveStrategy<ManagerEvent, State> createReceiveStrategy = new DefaultCreateManagerActorReceiveStrategy<>(managerDefinition);
+            ManagerStateFactory managerStateFactory = new CounterManagerStateFactory();
+            StateEventHandlers<Event, ManagerEventEnvelope, State> stateEventHandlers = new DefaultStateEventHandlers<>("counting", Collections.emptyList());
+            ManagerDefinition<Event, ManagerEventEnvelope, State> managerDefinition = new DefaultManagerDefinition("CounterNotificationMgr", boundedContextDefinition, "counting", Collections.singletonList(stateEventHandlers), Collections.emptyList(), managerStateFactory);
+            CreateManagerActorReceiveStrategy<ManagerEventEnvelope, State> createReceiveStrategy = new DefaultCreateManagerActorReceiveStrategy<>(managerDefinition);
 
             final ActorRef aggregateRef = system.actorOf(ManagerActor.props(managerDefinition, createReceiveStrategy));
             final ActorRef probe = getRef();

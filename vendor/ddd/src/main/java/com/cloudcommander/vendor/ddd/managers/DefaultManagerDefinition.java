@@ -2,7 +2,8 @@ package com.cloudcommander.vendor.ddd.managers;
 
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.StateEventHandlers;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.handlers.ManagerEventHandler;
+import com.cloudcommander.vendor.ddd.managers.managerevents.handlers.ManagerEventHandler;
+import com.cloudcommander.vendor.ddd.managers.states.ManagerStateFactory;
 
 import java.util.List;
 
@@ -21,12 +22,15 @@ public class DefaultManagerDefinition implements ManagerDefinition{
 
     private List<ManagerEventHandler> managerEventHandlers;
 
-    public DefaultManagerDefinition(String name, BoundedContextDefinition boundedContextDefinition, String startStateName, List<? extends StateEventHandlers> stateEventHandlers, List<ManagerEventHandler> managerEventHandlers) {
+    private ManagerStateFactory managerStateFactory;
+
+    public DefaultManagerDefinition(String name, BoundedContextDefinition boundedContextDefinition, String startStateName, List<? extends StateEventHandlers> stateEventHandlers, List<ManagerEventHandler> managerEventHandlers, ManagerStateFactory managerStateFactory) {
         this.name = name;
         this.boundedContextDefinition = boundedContextDefinition;
         this.startStateName = startStateName;
         this.stateEventHandlers = stateEventHandlers;
         this.managerEventHandlers = managerEventHandlers;
+        this.managerStateFactory = managerStateFactory;
     }
 
     @Override
@@ -52,5 +56,10 @@ public class DefaultManagerDefinition implements ManagerDefinition{
     @Override
     public List<ManagerEventHandler> getManagerEventHandlers() {
         return managerEventHandlers;
+    }
+
+    @Override
+    public ManagerStateFactory getManagerStateFactory() {
+        return managerStateFactory;
     }
 }

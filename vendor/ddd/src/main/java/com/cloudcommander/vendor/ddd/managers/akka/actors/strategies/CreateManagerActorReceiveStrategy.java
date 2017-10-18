@@ -3,7 +3,8 @@ package com.cloudcommander.vendor.ddd.managers.akka.actors.strategies;
 import akka.actor.AbstractActor;
 import akka.japi.Procedure;
 import akka.japi.pf.FI;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEventEnvelope;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
 import java.util.function.BiConsumer;

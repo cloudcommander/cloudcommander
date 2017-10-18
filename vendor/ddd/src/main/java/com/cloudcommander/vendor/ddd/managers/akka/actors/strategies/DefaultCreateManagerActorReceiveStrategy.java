@@ -8,8 +8,9 @@ import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.managers.ManagerDefinition;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.EventHandler;
 import com.cloudcommander.vendor.ddd.managers.events.handlers.StateEventHandlers;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.handlers.ManagerEventHandler;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEventEnvelope;
+import com.cloudcommander.vendor.ddd.managers.managerevents.handlers.ManagerEventHandler;
 import com.cloudcommander.vendor.ddd.managers.responses.UnhandledEventResponse;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
@@ -69,7 +70,8 @@ public class DefaultCreateManagerActorReceiveStrategy<T extends Event, U extends
             final Class<T> eventClass = eventHandler.getEventClass();
             receiveBuilder.match(eventClass, evt -> {
                 S state = stateSupplier.get();
-                U managerEvent = eventHandler.handle(evt, state);
+                ManagerEventEnvelope<U> managerEventEnvelope = eventHandler.handle(evt, state);
+                U managerEvent = managerEventEnvelope.getEvent();
 
                 persistFn.accept(managerEvent, mgrEvt -> {
                     receiveRecover.onMessage().apply(mgrEvt);

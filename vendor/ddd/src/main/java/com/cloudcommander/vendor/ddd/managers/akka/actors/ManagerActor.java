@@ -3,10 +3,12 @@ package com.cloudcommander.vendor.ddd.managers.akka.actors;
 import akka.actor.Props;
 import akka.persistence.AbstractPersistentActor;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
+
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.managers.ManagerDefinition;
 import com.cloudcommander.vendor.ddd.managers.akka.actors.strategies.CreateManagerActorReceiveStrategy;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.states.ManagerStateFactory;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
 import java.util.HashMap;
@@ -30,10 +32,17 @@ public class ManagerActor <T extends Event, U extends ManagerEvent, S extends St
     public ManagerActor(ManagerDefinition<T, U, S> managerDefinition, CreateManagerActorReceiveStrategy<U, S> createReceiveStrategy){
         this.managerDefinition = managerDefinition;
 
+        setInitialState();
+
         stateReceivers = new HashMap<>();
         this.createReceiveStrategy = createReceiveStrategy;
 
         receiveRecover = createReceiveStrategy.createReceiveRecover(() -> this.state);
+    }
+
+    protected void setInitialState() {
+        final ManagerStateFactory<S> stateFactory =  managerDefinition.getManagerStateFactory();
+        state = stateFactory.create(managerDefinition);
     }
 
     @Override

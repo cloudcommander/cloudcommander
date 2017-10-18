@@ -1,7 +1,8 @@
 package com.cloudcommander.vendor.ddd.managers.events.handlers;
 
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
-import com.cloudcommander.vendor.ddd.managers.managerlogs.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEvent;
+import com.cloudcommander.vendor.ddd.managers.managerevents.ManagerEventEnvelope;
 import com.cloudcommander.vendor.ddd.managers.states.State;
 
 import java.util.List;
