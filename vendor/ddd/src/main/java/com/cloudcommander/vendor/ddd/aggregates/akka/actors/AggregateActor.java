@@ -30,11 +30,11 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
 
     private S state;
 
-    Set<String> tags;
+    private Set<String> tags;
 
     private Receive receiveRecover;
 
-    public AggregateActor(final AggregateDefinition aggregateDefinition){
+    public AggregateActor(final AggregateDefinition<T, U, V, W, S> aggregateDefinition){
         this.aggregateDefinition = aggregateDefinition;
 
         setInitialState();
@@ -63,17 +63,17 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
         receiveRecover = receiveBuilder.build();
     }
 
-    private void createAggregateTags(final AggregateDefinition aggregateDefinition) {
+    private void createAggregateTags(final AggregateDefinition<T, U, V, W, S> aggregateDefinition) {
         tags = new HashSet<>();
 
-        String boundedContextName = aggregateDefinition.getBoundedContextDefinition().getName();
+        String boundedContextName = getAggregateDefinition().getBoundedContextDefinition().getName();
         String aggregateTag = boundedContextName + "-" + aggregateDefinition.getName();
         tags.add(boundedContextName);
         tags.add(aggregateTag);
     }
 
     protected void setInitialState(){
-        final StateFactory<S> stateFactory =  aggregateDefinition.getStateFactory();
+        final StateFactory<S> stateFactory =  getAggregateDefinition().getStateFactory();
         state = stateFactory.create();
     }
 
@@ -84,21 +84,11 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
 
     @Override
     public Receive createReceive() {
-        //Create event handler map
-        List<? extends EventHandler<U, S>> eventHandlers = aggregateDefinition.getEventHandlers();
-
-        final Map<Class<U>, EventHandler<U, S>> eventHandlerMap = new HashMap<>(eventHandlers.size());
-        for(final EventHandler<U, S> eventHandler: eventHandlers){
-            Class<U> eventClass = eventHandler.getEventClass();
-
-            eventHandlerMap.put(eventClass, eventHandler);
-        }
-
         //Create Receive
         ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
 
         //Handle defined commands
-        List<? extends CommandHandler<T, U, S>> commandHandlers = aggregateDefinition.getCommandHandlers();
+        List<? extends CommandHandler<T, U, S>> commandHandlers = getAggregateDefinition().getCommandHandlers();
         for(CommandHandler<T, U, S> commandHandler: commandHandlers){
             Class<T> commandClass = commandHandler.getCommandClass();
             receiveBuilder.match(commandClass, command -> {
@@ -114,7 +104,7 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
         }
 
         //Handle defined queries
-        List<? extends QueryHandler<V, W, S>> queryHandlers = aggregateDefinition.getQueryHandlers();
+        List<? extends QueryHandler<V, W, S>> queryHandlers = getAggregateDefinition().getQueryHandlers();
         for(QueryHandler<V, W, S> queryHandler: queryHandlers){
             Class<V> queryClass = queryHandler.getQueryClass();
             receiveBuilder.match(queryClass, query -> {
@@ -138,17 +128,18 @@ public class AggregateActor<T extends Command, U extends Event, V extends Query,
 
     @Override
     public String persistenceId() {
+        AggregateDefinition aggregateDefinition = getAggregateDefinition();
         String aggregateName = aggregateDefinition.getName();
         BoundedContextDefinition boundedContextDefinition = aggregateDefinition.getBoundedContextDefinition();
 
         return boundedContextDefinition.getName() + '-' + aggregateName + '-' + getSelf().path().name();
     }
 
-    protected AggregateDefinition getAggregateDefinition() {
+    protected AggregateDefinition<T, U, V, W, S> getAggregateDefinition() {
         return aggregateDefinition;
     }
 
-    public static Props props(final AggregateDefinition aggregateDefinition) {
-        return Props.create(AggregateActor.class, () -> new AggregateActor(aggregateDefinition));
+    public static <T extends Command, U extends Event, V extends Query, W extends Result, S extends com.cloudcommander.vendor.ddd.aggregates.states.State> Props props(final AggregateDefinition<T, U, V, W, S> aggregateDefinition) {
+        return Props.create(AggregateActor.class, () -> new AggregateActor<>(aggregateDefinition));
     }
 }
