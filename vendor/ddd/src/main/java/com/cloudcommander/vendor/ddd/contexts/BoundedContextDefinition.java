@@ -1,5 +1,10 @@
 package com.cloudcommander.vendor.ddd.contexts;
 
-public interface BoundedContextDefinition {
-    String getName();
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+
+@EqualsAndHashCode
+@Value
+public class BoundedContextDefinition {
+    private String name;
 }

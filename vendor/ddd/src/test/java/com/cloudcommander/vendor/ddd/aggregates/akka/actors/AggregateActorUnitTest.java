@@ -26,7 +26,6 @@ import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.results.Valu
 import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterStateFactory;
 import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.commands.IncrementCommand;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
-import com.cloudcommander.vendor.ddd.contexts.DefaultBoundedContextDefinition;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -41,7 +40,7 @@ import java.util.UUID;
 public class AggregateActorUnitTest{
 
     private StateFactory stateFactory = new CounterStateFactory();
-    private BoundedContextDefinition counterBoundedContextDefinition = new DefaultBoundedContextDefinition("Counter");
+    private BoundedContextDefinition counterBoundedContextDefinition = new BoundedContextDefinition("Counter");
 
     private static ActorSystem system;
 
