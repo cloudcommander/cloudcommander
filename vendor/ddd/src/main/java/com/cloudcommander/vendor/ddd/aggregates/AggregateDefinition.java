@@ -10,20 +10,26 @@ import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
 import java.util.List;
 
-public interface AggregateDefinition<T extends Command, U extends Event, V extends Query, W extends Result, S extends State> {
+@EqualsAndHashCode
+@NonFinal
+@Value
+public class AggregateDefinition<T extends Command, U extends Event, V extends Query, W extends Result, S extends State> {
 
-    String getName();
+    private String name;
 
-    BoundedContextDefinition getBoundedContextDefinition();
+    private BoundedContextDefinition boundedContextDefinition;
 
-    StateFactory<S> getStateFactory();
+    private StateFactory<S> stateFactory;
 
-    List<? extends CommandHandler<T, U, S>> getCommandHandlers();
+    private List<? extends CommandHandler<T, U, S>> commandHandlers;
 
-    List<? extends EventHandler<U, S>> getEventHandlers();
+    private List<? extends EventHandler<U, S>> eventHandlers;
 
-    List<? extends QueryHandler<V, W, S>> getQueryHandlers();
+    private List<? extends QueryHandler<V, W, S>> queryHandlers;
 }

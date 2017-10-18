@@ -7,7 +7,6 @@ import akka.actor.PoisonPill;
 import akka.actor.Terminated;
 import akka.testkit.javadsl.TestKit;
 import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
-import com.cloudcommander.vendor.ddd.aggregates.DefaultAggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
@@ -60,7 +59,7 @@ public class AggregateActorUnitTest{
     @Test
     public void testNonMappedCommand(){
         new TestKit(system) {{
-            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            AggregateDefinition aggregateDefinition = new AggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
             final ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition));
             final ActorRef probe = getRef();
@@ -81,7 +80,7 @@ public class AggregateActorUnitTest{
             List<CommandHandler<? extends Command, ? extends Event, ? extends State>> commandHandlers = Collections.singletonList(new IncrementCommandHandler());
             List<EventHandler<? extends Event, ? extends State>> eventHandlers = Collections.singletonList(new ValueChangedEventHandler());
             List<QueryHandler<? extends Query, ? extends Result, ? extends State>> queryHandlers = Collections.singletonList(new GetValueQueryHandler());
-            AggregateDefinition aggregateDefinition = new DefaultAggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, commandHandlers, eventHandlers, queryHandlers);
+            AggregateDefinition aggregateDefinition = new AggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, commandHandlers, eventHandlers, queryHandlers);
 
             ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition), "testCounter");
             final ActorRef probe = getRef();
