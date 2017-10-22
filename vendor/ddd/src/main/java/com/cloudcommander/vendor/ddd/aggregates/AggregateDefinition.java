@@ -1,11 +1,12 @@
 package com.cloudcommander.vendor.ddd.aggregates;
 
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
-import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
+import com.cloudcommander.vendor.ddd.aggregates.commands.StateCommandHandlers;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
+import com.cloudcommander.vendor.ddd.aggregates.fsmstates.FSMState;
 import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
-import com.cloudcommander.vendor.ddd.aggregates.queries.QueryHandler;
+import com.cloudcommander.vendor.ddd.aggregates.queries.StateQueryHandlers;
 import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
@@ -15,9 +16,9 @@ import lombok.Value;
 import lombok.experimental.NonFinal;
 
 import java.util.List;
+import java.util.Map;
 
 @EqualsAndHashCode
-@NonFinal
 @Value
 public class AggregateDefinition<T extends Command, U extends Event, V extends Query, W extends Result, S extends State> {
 
@@ -27,9 +28,11 @@ public class AggregateDefinition<T extends Command, U extends Event, V extends Q
 
     private StateFactory<S> stateFactory;
 
-    private List<? extends CommandHandler<T, U, S>> commandHandlers;
+    private List<StateCommandHandlers<T, U , S>> stateCommandHandlersList;
 
-    private List<? extends EventHandler<U, S>> eventHandlers;
+    private Map<U, EventHandler<U, S>> eventHandlerMap;
 
-    private List<? extends QueryHandler<V, W, S>> queryHandlers;
+    private List<StateQueryHandlers<V, W, S>> stateQueryHandlersList;
+
+    private FSMState initialFSMState;
 }

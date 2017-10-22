@@ -9,7 +9,6 @@ import lombok.experimental.NonFinal;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper=true)
-@NonFinal
 @Value
 public class IncrementCommand extends Command<UUID> {
     @Builder

@@ -8,10 +8,10 @@ import lombok.experimental.NonFinal;
 import lombok.experimental.Wither;
 
 @Builder
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode
 @NonFinal
 @Value
 @Wither
-public class CounterState extends State {
+public class CounterState implements State {
     private long value;
 }

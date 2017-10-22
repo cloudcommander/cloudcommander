@@ -1,145 +1,155 @@
 package com.cloudcommander.vendor.ddd.aggregates.akka.actors;
 
 import akka.actor.Props;
-import akka.japi.pf.ReceiveBuilder;
-import akka.persistence.AbstractPersistentActor;
-import akka.persistence.SnapshotOffer;
-import akka.persistence.journal.Tagged;
+import akka.japi.pf.FI;
+import akka.persistence.fsm.AbstractPersistentFSM;
+import akka.persistence.fsm.PersistentFSM;
+
+import akka.persistence.fsm.japi.pf.FSMStateFunctionBuilder;
 import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
 import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
 import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
+import com.cloudcommander.vendor.ddd.aggregates.commands.StateCommandHandlers;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
 import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
 import com.cloudcommander.vendor.ddd.aggregates.queries.QueryHandler;
+import com.cloudcommander.vendor.ddd.aggregates.queries.StateQueryHandlers;
 import com.cloudcommander.vendor.ddd.aggregates.responses.UnhandledCommandResponse;
 import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 import com.cloudcommander.vendor.ddd.aggregates.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-public class AggregateActor<T extends Command, U extends Event, V extends Query, W extends Result, S extends State> extends AbstractPersistentActor {
 
-    private static Logger LOG = LogManager.getLogger(AggregateActor.class);
+public class AggregateActor extends AbstractPersistentFSM<PersistentFSM.FSMState, State, Event> {
 
-    private final AggregateDefinition<T, U, V, W, S> aggregateDefinition;
+    private final Map<Event, EventHandler> eventHandlerMap;
 
-    private S state;
+    private final String persistenceId;
 
-    private Set<String> tags;
+    public AggregateActor(AggregateDefinition aggregateDefinition){
 
-    private Receive receiveRecover;
+        eventHandlerMap = aggregateDefinition.getEventHandlerMap();
 
-    public AggregateActor(final AggregateDefinition<T, U, V, W, S> aggregateDefinition){
-        this.aggregateDefinition = aggregateDefinition;
+        persistenceId = createPersistenceId(aggregateDefinition);
 
-        setInitialState();
-        createAggregateTags(aggregateDefinition);
-
-        setupReceiveRecover();
+        setUpFSM(aggregateDefinition);
     }
 
-    private void setupReceiveRecover() {
-        ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
+    private void setUpFSM(AggregateDefinition aggregateDefinition) {
+        StateFactory stateFactory = aggregateDefinition.getStateFactory();
+        com.cloudcommander.vendor.ddd.aggregates.states.State initialState = stateFactory.create();
 
-        //Restore from snapshots
-        receiveBuilder.match(SnapshotOffer.class, snapshotOffer -> {
-            state = (S)snapshotOffer.snapshot();
-        });
+        startWith(aggregateDefinition.getInitialFSMState(), initialState);
 
-        //Handle defined events
-        List<? extends EventHandler<U, S>> eventHandlers = aggregateDefinition.getEventHandlers();
-        for(EventHandler<U, S> eventHandler: eventHandlers){
-            Class<U> eventClass = eventHandler.getEventClass();
-            receiveBuilder.match(eventClass, event -> {
-                state = eventHandler.handle(event, state);
-            });
-        }
+        //Setup query handlers
+        {
+            final List<StateQueryHandlers> stateQueryHandlersList = aggregateDefinition.getStateQueryHandlersList();
+            for(StateQueryHandlers stateQueryHandlers: stateQueryHandlersList){
+                FSMState fsmState = stateQueryHandlers.getFsmState();
+                List<QueryHandler> queryHandlers = stateQueryHandlers.getQueryHandlers();
 
-        receiveRecover = receiveBuilder.build();
-    }
+                FSMStateFunctionBuilder builder = null;
 
-    private void createAggregateTags(final AggregateDefinition<T, U, V, W, S> aggregateDefinition) {
-        tags = new HashSet<>();
+                for(QueryHandler queryHandler: queryHandlers){
+                    Class queryClass = queryHandler.getQueryClass();
+                    FI.Apply2<Query, com.cloudcommander.vendor.ddd.aggregates.states.State, State<FSMState, com.cloudcommander.vendor.ddd.aggregates.states.State, com.cloudcommander.vendor.ddd.aggregates.events.Event>> apply2 = (query, state) -> {
+                        Result result = queryHandler.handle(query, state);
+                        return stay().replying(result);
+                    };
 
-        String boundedContextName = getAggregateDefinition().getBoundedContextDefinition().getName();
-        String aggregateTag = boundedContextName + "-" + aggregateDefinition.getName();
-        tags.add(boundedContextName);
-        tags.add(aggregateTag);
-    }
+                    if(builder == null){
+                        builder = matchEvent(queryClass, apply2);
+                    }else{
+                        builder.event(queryClass, apply2);
+                    }
+                }
 
-    protected void setInitialState(){
-        final StateFactory<S> stateFactory =  getAggregateDefinition().getStateFactory();
-        state = stateFactory.create();
-    }
-
-    @Override
-    public Receive createReceiveRecover() {
-        return receiveRecover;
-    }
-
-    @Override
-    public Receive createReceive() {
-        //Create Receive
-        ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
-
-        //Handle defined commands
-        List<? extends CommandHandler<T, U, S>> commandHandlers = getAggregateDefinition().getCommandHandlers();
-        for(CommandHandler<T, U, S> commandHandler: commandHandlers){
-            Class<T> commandClass = commandHandler.getCommandClass();
-            receiveBuilder.match(commandClass, command -> {
-                final U event = commandHandler.handle(command, state);
-                Tagged taggedEvent = new Tagged(event, tags);
-
-                persist(taggedEvent, param -> {
-                   receiveRecover.onMessage().apply(event);
-
-                    getSender().tell(event, getSelf());
-                });
-            });
-        }
-
-        //Handle defined queries
-        List<? extends QueryHandler<V, W, S>> queryHandlers = getAggregateDefinition().getQueryHandlers();
-        for(QueryHandler<V, W, S> queryHandler: queryHandlers){
-            Class<V> queryClass = queryHandler.getQueryClass();
-            receiveBuilder.match(queryClass, query -> {
-                final Result result = queryHandler.handle(query, state);
-
-                getSender().tell(result, getSelf());
-            });
-        }
-
-        receiveBuilder.matchAny(o -> {
-            if(LOG.isWarnEnabled()){
-                LOG.warn("Unhandled command type [" + o.getClass() + "] for actor: [" + getSelf().path().toStringWithoutAddress() + "]");
+                if(builder != null){
+                    when(fsmState, builder);
+                }
             }
+        }
 
-            UnhandledCommandResponse unhandledCommandResponse = new UnhandledCommandResponse(o.getClass());
-            getSender().tell(unhandledCommandResponse, getSelf());
-        });
+        //Setup command handlers
+        {
+            final List<StateCommandHandlers> stateCommandHandlersList = aggregateDefinition.getStateCommandHandlersList();
+            for(StateCommandHandlers stateCommandHandlers: stateCommandHandlersList){
+                FSMState fsmState = stateCommandHandlers.getFsmState();
+                List<CommandHandler> commandHandlers = stateCommandHandlers.getCommandHandlers();
 
-        return receiveBuilder.build();
+                FSMStateFunctionBuilder builder = null;
+
+                for(CommandHandler commandHandler: commandHandlers){
+                    Class commandClass = commandHandler.getCommandClass();
+                    FI.Apply2<Command, com.cloudcommander.vendor.ddd.aggregates.states.State, State<FSMState, com.cloudcommander.vendor.ddd.aggregates.states.State, com.cloudcommander.vendor.ddd.aggregates.events.Event>> apply2 = (command, state) -> {
+                        com.cloudcommander.vendor.ddd.aggregates.events.Event event = commandHandler.handle(command, state);
+
+                        //TODO tello transitions
+
+                        return stay().applying(event).replying(event);
+                    };
+
+                    if(builder == null){
+                        builder = matchEvent(commandClass, apply2);
+                    }else{
+                        builder.event(commandClass, apply2);
+                    }
+                }
+
+                //Fallback command handler
+                if(builder == null){
+                    builder = matchAnyEvent((command, state) -> {
+                        final UnhandledCommandResponse unhandledCommandResponse = new UnhandledCommandResponse(command.getClass());
+
+                        return stay().replying(unhandledCommandResponse);
+                    });
+                }else{
+                    builder.anyEvent((command, o2) -> {
+                        final UnhandledCommandResponse unhandledCommandResponse = new UnhandledCommandResponse(command.getClass());
+
+                        return stay().replying(unhandledCommandResponse);
+                    });
+                }
+
+                when(fsmState, builder);
+            }
+        }
     }
 
-    @Override
-    public String persistenceId() {
-        AggregateDefinition aggregateDefinition = getAggregateDefinition();
+    private String createPersistenceId(AggregateDefinition aggregateDefinition){
         String aggregateName = aggregateDefinition.getName();
         BoundedContextDefinition boundedContextDefinition = aggregateDefinition.getBoundedContextDefinition();
 
         return boundedContextDefinition.getName() + '-' + aggregateName + '-' + getSelf().path().name();
     }
 
-    protected AggregateDefinition<T, U, V, W, S> getAggregateDefinition() {
-        return aggregateDefinition;
+    @Override
+    public com.cloudcommander.vendor.ddd.aggregates.states.State applyEvent(com.cloudcommander.vendor.ddd.aggregates.events.Event event, com.cloudcommander.vendor.ddd.aggregates.states.State state) {
+        Class<? extends com.cloudcommander.vendor.ddd.aggregates.events.Event> eventClass = event.getClass();
+        EventHandler eventHandler = eventHandlerMap.get(eventClass);
+        if(eventHandler == null){
+            throw new RuntimeException("Unhandled event: [" + eventClass + "]");
+        }
+
+        return eventHandler.handle(event, state);
     }
 
-    public static <T extends Command, U extends Event, V extends Query, W extends Result, S extends com.cloudcommander.vendor.ddd.aggregates.states.State> Props props(final AggregateDefinition<T, U, V, W, S> aggregateDefinition) {
-        return Props.create(AggregateActor.class, () -> new AggregateActor<>(aggregateDefinition));
+    @Override
+    public Class<com.cloudcommander.vendor.ddd.aggregates.events.Event> domainEventClass() {
+        return com.cloudcommander.vendor.ddd.aggregates.events.Event.class;
+    }
+
+    @Override
+    public String persistenceId() {
+        return persistenceId;
+    }
+
+    public static Props props(final AggregateDefinition aggregateDefinition) {
+        return Props.create(AggregateActor.class, () -> new AggregateActor(aggregateDefinition));
     }
 }
