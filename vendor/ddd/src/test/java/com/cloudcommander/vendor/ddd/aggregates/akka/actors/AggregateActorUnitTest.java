@@ -87,7 +87,7 @@ public class AggregateActorUnitTest{
     @Test
     public void testCounterAggregate(){
         new TestKit(system) {{
-            List<CommandHandler<? extends Command, ? extends Event, ? extends State>> countingCommandHandlers = Collections.singletonList(new IncrementCommandHandler());
+            List<CommandHandler<? extends Command, ? extends Event, ? extends State, ? extends FSMState>> countingCommandHandlers = Collections.singletonList(new IncrementCommandHandler());
             StateCommandHandlers countingStateCommandHandlers = new StateCommandHandlers(CounterFSMState.COUNTING, countingCommandHandlers);
             List<StateCommandHandlers> stateCommandHandlers = Collections.singletonList(countingStateCommandHandlers);
 

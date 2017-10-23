@@ -12,6 +12,7 @@ import com.cloudcommander.vendor.ddd.aggregates.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.aggregates.commands.StateCommandHandlers;
 import com.cloudcommander.vendor.ddd.aggregates.events.Event;
 import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
+import com.cloudcommander.vendor.ddd.aggregates.fsmstates.FSMState;
 import com.cloudcommander.vendor.ddd.aggregates.queries.Query;
 import com.cloudcommander.vendor.ddd.aggregates.queries.QueryHandler;
 import com.cloudcommander.vendor.ddd.aggregates.queries.StateQueryHandlers;
@@ -87,11 +88,18 @@ public class AggregateActor extends AbstractPersistentFSM<PersistentFSM.FSMState
                 for(CommandHandler commandHandler: commandHandlers){
                     Class commandClass = commandHandler.getCommandClass();
                     FI.Apply2<Command, com.cloudcommander.vendor.ddd.aggregates.states.State, State<FSMState, com.cloudcommander.vendor.ddd.aggregates.states.State, com.cloudcommander.vendor.ddd.aggregates.events.Event>> apply2 = (command, state) -> {
-                        com.cloudcommander.vendor.ddd.aggregates.events.Event event = commandHandler.handle(command, state);
+                        CommandHandler.CommandHandlerResult<com.cloudcommander.vendor.ddd.aggregates.events.Event, com.cloudcommander.vendor.ddd.aggregates.fsmstates.FSMState> commandHandlerResult = commandHandler.handle(command, state);
 
-                        //TODO tello transitions
+                        com.cloudcommander.vendor.ddd.aggregates.fsmstates.FSMState newFsmState = commandHandlerResult.getNewFsmState();
+                        com.cloudcommander.vendor.ddd.aggregates.events.Event event = commandHandlerResult.getEvent();
 
-                        return stay().applying(event).replying(event);
+                        State<FSMState, com.cloudcommander.vendor.ddd.aggregates.states.State, com.cloudcommander.vendor.ddd.aggregates.events.Event> stateFn = null;
+                        if(newFsmState != null){
+                            stateFn = goTo(newFsmState);
+                        }else{
+                            stateFn = stay();
+                        }
+                        return stateFn.applying(event).replying(event);
                     };
 
                     if(builder == null){
