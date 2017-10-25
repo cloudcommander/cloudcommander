@@ -4,7 +4,9 @@ import com.cloudcommander.vendor.ddd.aggregates.events.EventHandler;
 import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterState;
 
-public class ValueChangedEventHandler implements EventHandler<ValueChangedEvent, CounterState> {
+import java.util.UUID;
+
+public class ValueChangedEventHandler implements EventHandler<UUID, ValueChangedEvent, CounterState> {
     @Override
     public CounterState handle(ValueChangedEvent event, CounterState state) {
         return state.withValue(event.getNewValue());

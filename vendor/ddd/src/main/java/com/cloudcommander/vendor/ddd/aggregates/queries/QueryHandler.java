@@ -3,10 +3,10 @@ package com.cloudcommander.vendor.ddd.aggregates.queries;
 import com.cloudcommander.vendor.ddd.aggregates.results.Result;
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 
-public interface QueryHandler <T extends Query, U extends Result, S extends State>{
-    U handle(T query, S state);
+public interface QueryHandler <U, Q extends Query<U>, R extends Result<U>, S extends State>{
+    R handle(Q query, S state);
 
     Class<S> getStateClass();
 
-    Class<T> getQueryClass();
+    Class<Q> getQueryClass();
 }

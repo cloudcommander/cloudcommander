@@ -13,8 +13,8 @@ import java.util.List;
  */
 @EqualsAndHashCode
 @Value
-public class StateQueryHandlers<T extends Query, U extends Result, S extends State>{
-    private FSMState fsmState;
+public class StateQueryHandlers<U, Q extends Query<U>, R extends Result<U>, S extends State, F extends FSMState>{
+    private F fsmState;
 
-    private List<? extends QueryHandler<T, U, S>> queryHandlers;
+    private List<? extends QueryHandler<U, Q, R, S>> queryHandlers;
 }

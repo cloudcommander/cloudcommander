@@ -20,7 +20,7 @@ import java.util.Map;
 
 @EqualsAndHashCode
 @Value
-public class AggregateDefinition<T extends Command, U extends Event, V extends Query, W extends Result, S extends State, X extends FSMState> {
+public class AggregateDefinition<U, C extends Command<U>, E extends Event<U>, Q extends Query<U>, R extends Result<U>, S extends State, F extends FSMState> {
 
     private String name;
 
@@ -28,11 +28,11 @@ public class AggregateDefinition<T extends Command, U extends Event, V extends Q
 
     private StateFactory<S> stateFactory;
 
-    private List<StateCommandHandlers<T, U , S, X>> stateCommandHandlersList;
+    private List<? extends StateCommandHandlers<U, C, E , S, F>> stateCommandHandlersList;
 
-    private Map<U, EventHandler<U, S>> eventHandlerMap;
+    private Map<E, ? extends EventHandler<U, E, S>> eventHandlerMap;
 
-    private List<StateQueryHandlers<V, W, S>> stateQueryHandlersList;
+    private List<? extends StateQueryHandlers<U, Q, R, S, F>> stateQueryHandlersList;
 
-    private FSMState initialFSMState;
+    private F initialFSMState;
 }

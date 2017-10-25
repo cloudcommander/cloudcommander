@@ -61,15 +61,15 @@ public class AggregateActorUnitTest{
     @Test
     public void testNonMappedCommand(){
         new TestKit(system) {{
-            StateCommandHandlers countingStateCommandHandlers = new StateCommandHandlers(CounterFSMState.COUNTING, Collections.emptyList());
-            List<StateCommandHandlers> stateCommandHandlers = Collections.singletonList(countingStateCommandHandlers);
+            final StateCommandHandlers<UUID, ? extends Command<UUID>, ? extends Event<UUID>, ? extends State, ? extends FSMState> countingStateCommandHandlers = new StateCommandHandlers<>(CounterFSMState.COUNTING, Collections.emptyList());
+            final List<? extends StateCommandHandlers<UUID, ? extends Command<UUID>, ? extends Event<UUID>, ? extends State, ? extends FSMState>> stateCommandHandlers = Collections.singletonList(countingStateCommandHandlers);
 
-            Map<FSMState, EventHandler> eventHandlerMap = Collections.emptyMap();
+            final Map<? extends FSMState, ? extends EventHandler<UUID, ? extends Event<UUID>, ? extends State>> eventHandlerMap = Collections.emptyMap();
 
-            StateQueryHandlers countingStateQueryHandlers = new StateQueryHandlers(CounterFSMState.COUNTING, Collections.emptyList());
-            List<StateQueryHandlers> stateQueryHandlers = Collections.singletonList(countingStateQueryHandlers);
+            final StateQueryHandlers<UUID, ? extends Query<UUID>, ? extends Result<UUID>, ? extends State, ? extends FSMState> countingStateQueryHandlers = new StateQueryHandlers<>(CounterFSMState.COUNTING, Collections.emptyList());
+            final List<? extends StateQueryHandlers<UUID, ? extends Query<UUID>, ? extends Result<UUID>, ? extends State, ? extends FSMState>> stateQueryHandlers = Collections.singletonList(countingStateQueryHandlers);
 
-            AggregateDefinition aggregateDefinition = new AggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, stateCommandHandlers, eventHandlerMap, stateQueryHandlers, CounterFSMState.COUNTING);
+            final AggregateDefinition<UUID, ? extends Command<UUID>, ? extends Event<UUID>, ? extends Query<UUID>, ? extends Result<UUID>, ? extends State, ? extends FSMState> aggregateDefinition = new AggregateDefinition<>("Counter", counterBoundedContextDefinition, stateFactory, stateCommandHandlers, eventHandlerMap, stateQueryHandlers, CounterFSMState.COUNTING);
 
             final ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition));
             final ActorRef probe = getRef();
@@ -87,18 +87,18 @@ public class AggregateActorUnitTest{
     @Test
     public void testCounterAggregate(){
         new TestKit(system) {{
-            List<CommandHandler<? extends Command, ? extends Event, ? extends State, ? extends FSMState>> countingCommandHandlers = Collections.singletonList(new IncrementCommandHandler());
-            StateCommandHandlers countingStateCommandHandlers = new StateCommandHandlers(CounterFSMState.COUNTING, countingCommandHandlers);
-            List<StateCommandHandlers> stateCommandHandlers = Collections.singletonList(countingStateCommandHandlers);
+            final List<CommandHandler<UUID, ? extends Command<UUID>, ? extends com.cloudcommander.vendor.ddd.aggregates.events.Event<UUID>, ? extends State, ? extends FSMState>> countingCommandHandlers = Collections.singletonList(new IncrementCommandHandler());
+            final StateCommandHandlers countingStateCommandHandlers = new StateCommandHandlers(CounterFSMState.COUNTING, countingCommandHandlers);
+            final List<StateCommandHandlers> stateCommandHandlers = Collections.singletonList(countingStateCommandHandlers);
 
-            Map<Class<? extends Event>, EventHandler> eventHandlerMap = new HashMap<>();
+            final Map<Class<? extends Event>, EventHandler> eventHandlerMap = new HashMap<>();
             eventHandlerMap.put(ValueChangedEvent.class, new ValueChangedEventHandler());
 
-            List<QueryHandler<? extends Query, ? extends Result, ? extends State>> countingQueryHandlers = Collections.singletonList(new GetValueQueryHandler());
-            StateQueryHandlers countingStateQueryHandlers = new StateQueryHandlers(CounterFSMState.COUNTING, countingQueryHandlers);
-            List<StateQueryHandlers> stateQueryHandlers = Collections.singletonList(countingStateQueryHandlers);
+            final List<? extends QueryHandler<UUID, ? extends Query<UUID>, ? extends Result<UUID>, ? extends State>> countingQueryHandlers = Collections.singletonList(new GetValueQueryHandler());
+            final StateQueryHandlers<UUID, Query<UUID>, Result<UUID>, State, FSMState> countingStateQueryHandlers = new StateQueryHandlers<>(CounterFSMState.COUNTING, countingQueryHandlers);
+            final List<StateQueryHandlers> stateQueryHandlers = Collections.singletonList(countingStateQueryHandlers);
 
-            AggregateDefinition aggregateDefinition = new AggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, stateCommandHandlers, eventHandlerMap, stateQueryHandlers, CounterFSMState.COUNTING);
+            final AggregateDefinition aggregateDefinition = new AggregateDefinition("Counter", counterBoundedContextDefinition, stateFactory, stateCommandHandlers, eventHandlerMap, stateQueryHandlers, CounterFSMState.COUNTING);
 
             ActorRef aggregateRef = system.actorOf(AggregateActor.props(aggregateDefinition), "testCounter");
             final ActorRef probe = getRef();

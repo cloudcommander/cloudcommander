@@ -13,8 +13,8 @@ import java.util.List;
  */
 @EqualsAndHashCode
 @Value
-public class StateCommandHandlers<T extends Command, U extends Event, S extends State, V extends FSMState> {
-    private FSMState fsmState;
+public class StateCommandHandlers<U, C extends Command<U>, E extends Event<U>, S extends State, F extends FSMState> {
+    private F fsmState;
 
-    private List<? extends CommandHandler<T, U, S, V>> commandHandlers;
+    private List<? extends CommandHandler<U, C, E, S, F>> commandHandlers;
 }

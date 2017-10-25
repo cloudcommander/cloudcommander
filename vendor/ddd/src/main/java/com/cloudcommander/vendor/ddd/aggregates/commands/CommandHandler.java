@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 
-public interface CommandHandler<T extends Command, U extends com.cloudcommander.vendor.ddd.aggregates.events.Event, S extends State, V extends FSMState>{
+public interface CommandHandler<U, C extends Command<U>, E extends com.cloudcommander.vendor.ddd.aggregates.events.Event<U>, S extends State, F extends FSMState>{
 
     @Builder
     @EqualsAndHashCode
@@ -19,9 +19,9 @@ public interface CommandHandler<T extends Command, U extends com.cloudcommander.
         private U event;
     }
 
-    CommandHandlerResult<U, V> handle(T cmd, S state);
+    CommandHandlerResult<E, F> handle(C cmd, S state);
 
     Class<S> getStateClass();
 
-    Class<T> getCommandClass();
+    Class<C> getCommandClass();
 }

@@ -8,7 +8,7 @@ import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.Counte
 
 import java.util.UUID;
 
-public class IncrementCommandHandler implements CommandHandler<IncrementCommand, ValueChangedEvent, CounterState, CounterFSMState> {
+public class IncrementCommandHandler implements CommandHandler<UUID, IncrementCommand, ValueChangedEvent, CounterState, CounterFSMState> {
 
     @Override
     public CommandHandlerResult<ValueChangedEvent, CounterFSMState> handle(IncrementCommand cmd, CounterState state) {

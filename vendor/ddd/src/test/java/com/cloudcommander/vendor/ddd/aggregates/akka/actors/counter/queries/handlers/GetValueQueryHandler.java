@@ -5,7 +5,9 @@ import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.queries.GetV
 import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.results.ValueResult;
 import com.cloudcommander.vendor.ddd.aggregates.akka.actors.counter.state.CounterState;
 
-public class GetValueQueryHandler implements QueryHandler<GetValueQuery, ValueResult, CounterState>{
+import java.util.UUID;
+
+public class GetValueQueryHandler implements QueryHandler<UUID, GetValueQuery, ValueResult, CounterState>{
     @Override
     public ValueResult handle(GetValueQuery query, CounterState state) {
 

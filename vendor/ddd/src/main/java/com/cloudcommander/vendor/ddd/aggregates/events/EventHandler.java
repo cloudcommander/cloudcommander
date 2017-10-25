@@ -2,10 +2,10 @@ package com.cloudcommander.vendor.ddd.aggregates.events;
 
 import com.cloudcommander.vendor.ddd.aggregates.states.State;
 
-public interface EventHandler <T extends Event, S extends State> {
-    S handle(T event, S state);
+public interface EventHandler <U, E extends Event<U>, S extends State> {
+    S handle(E event, S state);
 
     Class<S> getStateClass();
 
-    Class<T> getEventClass();
+    Class<E> getEventClass();
 }
