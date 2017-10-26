@@ -4,9 +4,9 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.cloudcommander.vendor.ddd.aggregates.AggregateDefinition;
-import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
-import com.cloudcommander.vendor.ddd.aggregates.akka.actors.AggregateRouter;
+import com.cloudcommander.vendor.ddd.entities.EntityDefinition;
+import com.cloudcommander.vendor.ddd.entities.commands.Command;
+import com.cloudcommander.vendor.ddd.entities.akka.actors.EntityRouter;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.Future;
 import java.util.concurrent.CompletionStage;
@@ -19,15 +19,15 @@ public class DefaultDddService implements DddService{
 
     private ActorRef aggregateRouterRef;
 
-    public DefaultDddService(ActorSystem actorSystem, Timeout timeout, AggregateDefinition aggregateDefinition) {
+    public DefaultDddService(ActorSystem actorSystem, Timeout timeout, EntityDefinition entityDefinition) {
         this.timeout = timeout;
         this.actorSystem = actorSystem;
 
-        String name = aggregateDefinition.getName();
-        String boundedCtxName = aggregateDefinition.getBoundedContextDefinition().getName();
+        String name = entityDefinition.getName();
+        String boundedCtxName = entityDefinition.getBoundedContextDefinition().getName();
         String routerPath = boundedCtxName + "--" + name;
 
-        aggregateRouterRef = actorSystem.actorOf(AggregateRouter.props(aggregateDefinition), routerPath);
+        aggregateRouterRef = actorSystem.actorOf(EntityRouter.props(entityDefinition), routerPath);
 
     }
 

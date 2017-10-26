@@ -1,7 +1,7 @@
 package com.cloudcommander.vendor.ddd.services;
 
 import akka.util.Timeout;
-import com.cloudcommander.vendor.ddd.aggregates.commands.Command;
+import com.cloudcommander.vendor.ddd.entities.commands.Command;
 
 import java.util.concurrent.CompletionStage;
 
