@@ -13,12 +13,12 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode
 @Value
-public class StateQueryHandlers<U, BQ extends Query<U>, BR extends Result<U>, S extends State, F extends FSMState>{
+public class StateQueryHandlers<U, S extends State, F extends FSMState>{
 
     @NonNull
     private F fsmState;
 
     @NonNull
     @Singular
-    private List<? extends QueryHandler<U, ? extends BQ, BR, S, ? extends BQ>> queryHandlers;
+    private List<? extends QueryHandler<U, S>> queryHandlers;
 }

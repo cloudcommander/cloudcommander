@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Wither
 public class StateEnvelope<F extends FSMState, S extends State> implements Serializable{
     @NonNull
-    private FSMState fsmState;
+    private F fsmState;
 
     @NonNull
     private S state;

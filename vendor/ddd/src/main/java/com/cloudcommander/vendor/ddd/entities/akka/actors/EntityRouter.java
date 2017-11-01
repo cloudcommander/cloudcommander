@@ -5,22 +5,19 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.cloudcommander.vendor.ddd.entities.EntityDefinition;
 import com.cloudcommander.vendor.ddd.entities.commands.Command;
-import com.cloudcommander.vendor.ddd.entities.events.Event;
 import com.cloudcommander.vendor.ddd.entities.fsmstates.FSMState;
-import com.cloudcommander.vendor.ddd.entities.queries.Query;
-import com.cloudcommander.vendor.ddd.entities.results.Result;
 import com.cloudcommander.vendor.ddd.entities.states.State;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class EntityRouter extends AbstractActor {
+public class EntityRouter <U, S extends State, F extends FSMState> extends AbstractActor {
 
     private HashMap<Object, ActorRef>  entityRefs = new LinkedHashMap<>();
 
-    private EntityDefinition<Object, Command<Object>, Event<Object>, Query<Object>, Result<Object>, State, FSMState> entityDefinition;
+    private EntityDefinition<U, S, F> entityDefinition;
 
-    public EntityRouter(EntityDefinition<Object, Command<Object>, Event<Object>, Query<Object>, Result<Object>, State, FSMState> entityDefinition){
+    public EntityRouter(EntityDefinition<U, S, F> entityDefinition){
         this.entityDefinition = entityDefinition;
     }
 
@@ -47,7 +44,7 @@ public class EntityRouter extends AbstractActor {
         return getContext().actorOf(EntityActor.props(entityDefinition), targetId.toString());
     }
 
-    public static Props props(final EntityDefinition<Object, Command<Object>, Event<Object>, Query<Object>, Result<Object>, State, FSMState> entityDefinition) {
-        return Props.create(EntityRouter.class, () -> new EntityRouter(entityDefinition));
+    public static <U, S extends State, F extends FSMState> Props props(final EntityDefinition<U, S, F> entityDefinition) {
+        return Props.create(EntityRouter.class, () -> new EntityRouter<>(entityDefinition));
     }
 }

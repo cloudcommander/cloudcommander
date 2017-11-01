@@ -7,6 +7,7 @@ import akka.actor.PoisonPill;
 import akka.actor.Terminated;
 import akka.testkit.javadsl.TestKit;
 import com.cloudcommander.vendor.ddd.entities.EntityDefinition;
+import com.cloudcommander.vendor.ddd.entities.Message;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.commands.handlers.IncrementCommandHandler;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.events.ValueChangedEvent;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.events.handers.ValueChangedEventHandler;
@@ -15,18 +16,12 @@ import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.queries.GetVal
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.queries.handlers.GetValueQueryHandler;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.results.ValueResult;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.state.CounterState;
-import com.cloudcommander.vendor.ddd.entities.commands.Command;
-import com.cloudcommander.vendor.ddd.entities.commands.CommandHandler;
 import com.cloudcommander.vendor.ddd.entities.commands.StateCommandHandlers;
 import com.cloudcommander.vendor.ddd.entities.events.Event;
-import com.cloudcommander.vendor.ddd.entities.events.EventHandler;
+import com.cloudcommander.vendor.ddd.entities.events.EventEnvelope;
 import com.cloudcommander.vendor.ddd.entities.fsmstates.FSMState;
-import com.cloudcommander.vendor.ddd.entities.queries.Query;
-import com.cloudcommander.vendor.ddd.entities.queries.QueryHandler;
 import com.cloudcommander.vendor.ddd.entities.queries.StateQueryHandlers;
 import com.cloudcommander.vendor.ddd.entities.responses.UnhandledCommandResponse;
-import com.cloudcommander.vendor.ddd.entities.results.Result;
-import com.cloudcommander.vendor.ddd.entities.states.State;
 import com.cloudcommander.vendor.ddd.entities.states.StateFactory;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.state.CounterStateFactory;
 import com.cloudcommander.vendor.ddd.entities.akka.actors.counter.commands.IncrementCommand;
@@ -39,6 +34,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.*;
+
+import static akka.testkit.JavaTestKit.duration;
 
 @RunWith(JUnit4.class)
 public class EntityActorUnitTest {
@@ -62,15 +59,15 @@ public class EntityActorUnitTest {
     @Test
     public void testNonMappedCommand(){
         new TestKit(system) {{
-            StateCommandHandlers.StateCommandHandlersBuilder<UUID, Command<UUID>, Event<UUID> , CounterState, CounterFSMState> stateCommandHandlersBuilder = StateCommandHandlers.builder();
+            StateCommandHandlers.StateCommandHandlersBuilder<UUID, CounterState, CounterFSMState> stateCommandHandlersBuilder = StateCommandHandlers.builder();
             stateCommandHandlersBuilder.fsmState(CounterFSMState.COUNTING);
-            final StateCommandHandlers<UUID, Command<UUID>, Event<UUID> , CounterState, CounterFSMState> countingStateCommandHandlers = stateCommandHandlersBuilder.build();
+            final StateCommandHandlers<UUID, CounterState, CounterFSMState> countingStateCommandHandlers = stateCommandHandlersBuilder.build();
 
-            StateQueryHandlers.StateQueryHandlersBuilder<UUID, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> countingStateQueryHandlersBuilder = StateQueryHandlers.builder();
+            StateQueryHandlers.StateQueryHandlersBuilder<UUID, CounterState, CounterFSMState> countingStateQueryHandlersBuilder = StateQueryHandlers.builder();
             countingStateQueryHandlersBuilder.fsmState(CounterFSMState.COUNTING);
-            StateQueryHandlers<UUID, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> countingStateQueryHandlers = countingStateQueryHandlersBuilder.build();
+            StateQueryHandlers<UUID, CounterState, CounterFSMState> countingStateQueryHandlers = countingStateQueryHandlersBuilder.build();
 
-            final EntityDefinition<UUID, Command<UUID>, Event<UUID>, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> entityDefinition = EntityDefinition.<UUID, Command<UUID>, Event<UUID>, Query<UUID>, Result<UUID>, CounterState, CounterFSMState>builder()
+            final EntityDefinition<UUID, CounterState, CounterFSMState> entityDefinition = EntityDefinition.<UUID, CounterState, CounterFSMState>builder()
                     .name("Counter")
                     .boundedContextDefinition(counterBoundedContextDefinition)
                     .stateFactory(stateFactory)
@@ -95,20 +92,19 @@ public class EntityActorUnitTest {
     @Test
     public void testCounterAggregate(){
         new TestKit(system) {{
-            final EntityDefinition.EntityDefinitionBuilder<UUID, Command<UUID>, Event<UUID>, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> entityDefinitionBuilder = EntityDefinition.builder();
+            final EntityDefinition.EntityDefinitionBuilder<UUID, CounterState, CounterFSMState> entityDefinitionBuilder = EntityDefinition.builder();
 
-            StateCommandHandlers.StateCommandHandlersBuilder<UUID, Command<UUID>, Event<UUID> , CounterState, CounterFSMState> stateCommandHandlersBuilder = StateCommandHandlers.builder();
+            StateCommandHandlers.StateCommandHandlersBuilder<UUID, CounterState, CounterFSMState> stateCommandHandlersBuilder = StateCommandHandlers.builder();
             stateCommandHandlersBuilder.commandHandler(new IncrementCommandHandler());
             stateCommandHandlersBuilder.fsmState(CounterFSMState.COUNTING);
-            final StateCommandHandlers<UUID, Command<UUID>, Event<UUID> , CounterState, CounterFSMState> countingStateCommandHandlers = stateCommandHandlersBuilder.build();
+            final StateCommandHandlers<UUID, CounterState, CounterFSMState> countingStateCommandHandlers = stateCommandHandlersBuilder.build();
 
-            StateQueryHandlers.StateQueryHandlersBuilder<UUID, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> countingStateQueryHandlersBuilder = StateQueryHandlers.builder();
+            StateQueryHandlers.StateQueryHandlersBuilder<UUID, CounterState, CounterFSMState> countingStateQueryHandlersBuilder = StateQueryHandlers.builder();
             countingStateQueryHandlersBuilder.fsmState(CounterFSMState.COUNTING);
             countingStateQueryHandlersBuilder.queryHandler(new GetValueQueryHandler());
-            StateQueryHandlers<UUID, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> countingStateQueryHandlers = countingStateQueryHandlersBuilder.build();
+            StateQueryHandlers<UUID, CounterState, CounterFSMState> countingStateQueryHandlers = countingStateQueryHandlersBuilder.build();
 
-
-            final EntityDefinition<UUID, Command<UUID>, Event<UUID>, Query<UUID>, Result<UUID>, CounterState, CounterFSMState> entityDefinition = entityDefinitionBuilder
+            final EntityDefinition<UUID, CounterState, CounterFSMState> entityDefinition = entityDefinitionBuilder
                     .name("Counter")
                     .boundedContextDefinition(counterBoundedContextDefinition)
                     .stateFactory(stateFactory)
@@ -148,10 +144,15 @@ public class EntityActorUnitTest {
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
 
-                Object firstMessage = messages.get(0);
-                Assert.assertTrue(firstMessage instanceof ValueChangedEvent);
+                Object firstMessageEnvelopeObj = messages.get(0);
+                Assert.assertTrue(firstMessageEnvelopeObj instanceof EventEnvelope);
 
-                ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
+                EventEnvelope firstMessageEnvelope = (EventEnvelope)firstMessageEnvelopeObj;
+                Assert.assertNull(firstMessageEnvelope.getNewFSMState());
+
+                Event firstMessageEvent = firstMessageEnvelope.getEvent();
+                Assert.assertTrue(firstMessageEvent instanceof ValueChangedEvent);
+                ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessageEvent;
                 Assert.assertEquals(uuid, valueChangedEvent.getAggregateId());
                 Assert.assertEquals(1, valueChangedEvent.getNewValue());
             }
@@ -166,10 +167,16 @@ public class EntityActorUnitTest {
                 List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
 
-                Object firstMessage = messages.get(0);
-                Assert.assertTrue(firstMessage instanceof ValueChangedEvent);
+                Object firstMessageObj = messages.get(0);
+                Assert.assertTrue(firstMessageObj instanceof EventEnvelope);
 
-                ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
+                EventEnvelope firstMessageEventEnvelope = (EventEnvelope) firstMessageObj;
+                Assert.assertNull(firstMessageEventEnvelope.getNewFSMState());
+
+                Event firstMessageEvent = firstMessageEventEnvelope.getEvent();
+
+                Assert.assertTrue(firstMessageEvent instanceof ValueChangedEvent);
+                ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessageEvent;
                 Assert.assertEquals(uuid, valueChangedEvent.getAggregateId());
                 Assert.assertEquals(2, valueChangedEvent.getNewValue());
             }
@@ -187,13 +194,10 @@ public class EntityActorUnitTest {
                         .build();
                 aggregateRef.tell(incrementCommand, probe);
 
-                List<Object> messages = receiveN(1, duration("1 second"));
-                Assert.assertEquals(1, messages.size());
+                final EventEnvelope<UUID, FSMState> eventEnvelope = getEventEnvelope(this);
 
-                Object firstMessage = messages.get(0);
-                Assert.assertTrue(firstMessage instanceof ValueChangedEvent);
-
-                ValueChangedEvent valueChangedEvent = (ValueChangedEvent) firstMessage;
+                Assert.assertNull(eventEnvelope.getNewFSMState());
+                final ValueChangedEvent valueChangedEvent = getEvent(eventEnvelope, ValueChangedEvent.class);
                 Assert.assertEquals(uuid, valueChangedEvent.getAggregateId());
                 Assert.assertEquals(3, valueChangedEvent.getNewValue());
             }
@@ -205,15 +209,36 @@ public class EntityActorUnitTest {
                         .build();
                 aggregateRef.tell(getValueQuery, probe);
 
-                List<Object> messages = receiveN(1, duration("1 second"));
+                final List<Object> messages = receiveN(1, duration("1 second"));
                 Assert.assertEquals(1, messages.size());
 
-                Object firstMessage = messages.get(0);
+                final Object firstMessage = messages.get(0);
                 Assert.assertTrue(firstMessage instanceof ValueResult);
 
-                ValueResult valueResult = (ValueResult) firstMessage;
+                final ValueResult valueResult = (ValueResult) firstMessage;
                 Assert.assertEquals(3, valueResult.getValue());
             }
         }};
+    }
+
+    protected <U, F extends FSMState> EventEnvelope<U, F> getEventEnvelope(TestKit testKit){
+        return getResponse(testKit, EventEnvelope.class);
+    }
+
+    protected <U, M extends Message<U>> M getResponse(TestKit testKit, Class<M> messageClass){
+        final List<Object> messages = testKit.receiveN(1, duration("1 second"));
+        Assert.assertEquals(1, messages.size());
+
+        final Object firstMessage = messages.get(0);
+
+        Assert.assertTrue(messageClass.isInstance(firstMessage));
+        return (M)firstMessage;
+    }
+
+    protected <U, E extends Event<U>, F extends FSMState>  E getEvent(EventEnvelope<U, F> eventEnvelope, Class<E> eventClass){
+        final Event<U> event = eventEnvelope.getEvent();
+
+        Assert.assertTrue(eventClass.isInstance(event));
+        return (E)event;
     }
 }

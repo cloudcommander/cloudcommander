@@ -1,6 +1,5 @@
 package com.cloudcommander.vendor.ddd.entities.commands;
 
-import com.cloudcommander.vendor.ddd.entities.events.Event;
 import com.cloudcommander.vendor.ddd.entities.fsmstates.FSMState;
 import com.cloudcommander.vendor.ddd.entities.states.State;
 import lombok.*;
@@ -13,12 +12,12 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode
 @Value
-public class StateCommandHandlers<U, BC extends Command<U>, BE extends Event<U>, S extends State, F extends FSMState> {
+public class StateCommandHandlers<U, S extends State, F extends FSMState> {
 
     @NonNull
     private F fsmState;
 
     @NonNull
     @Singular
-    private List<? extends CommandHandler<U, BC, BE, S, F, ? extends BC>> commandHandlers;
+    private List<? extends CommandHandler<U, S, F>> commandHandlers;
 }

@@ -10,10 +10,10 @@ import com.cloudcommander.vendor.ddd.entities.events.Event;
 
 import java.util.UUID;
 
-public class IncrementCommandHandler implements CommandHandler<UUID, Command<UUID>, Event<UUID>, CounterState, CounterFSMState, IncrementCommand> {
+public class IncrementCommandHandler implements CommandHandler<UUID, CounterState, CounterFSMState> {
 
     @Override
-    public CommandHandlerResult<? extends Event<UUID>, CounterFSMState> handle(IncrementCommand cmd, CounterState state) {
+    public CommandHandlerResult<? extends Event<UUID>, CounterFSMState> handle(Command<UUID> cmd, CounterState state) {
         UUID uuid = cmd.getAggregateId();
         long newValue = state.getValue() + 1;
 
