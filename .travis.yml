@@ -13,4 +13,4 @@ addons:
       description: "Build submitted via Travis CI"
     build_command_prepend: "gradlew clean"
     build_command:   "gradlew build -x test"
-    branch_pattern: "*"
+    branch_pattern: "feature/domain-driven-dessign"
