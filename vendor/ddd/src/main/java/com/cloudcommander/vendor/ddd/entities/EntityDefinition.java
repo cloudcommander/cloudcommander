@@ -11,29 +11,36 @@ import com.cloudcommander.vendor.ddd.entities.results.Result;
 import com.cloudcommander.vendor.ddd.entities.states.State;
 import com.cloudcommander.vendor.ddd.entities.states.StateFactory;
 import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Builder
 @EqualsAndHashCode
 @Value
-public class EntityDefinition<U, C extends Command<U>, E extends Event<U>, Q extends Query<U>, R extends Result<U>, S extends State, F extends FSMState> {
+public class EntityDefinition<U, BC extends Command<U>, BE extends Event<U>, BQ extends Query<U>, BR extends Result<U>, S extends State, F extends FSMState> {
 
+    @NonNull
     private String name;
 
+    @NonNull
     private BoundedContextDefinition boundedContextDefinition;
 
+    @NonNull
     private StateFactory<S> stateFactory;
 
-    private List<? extends StateCommandHandlers<U, C, E , S, F>> stateCommandHandlersList;
+    @NonNull
+    @Singular
+    private List<? extends StateCommandHandlers<U, BC, BE , S, F>> stateCommandHandlers;
 
-    private Map<E, ? extends EventHandler<U, E, S>> eventHandlerMap;
+    @NonNull
+    @Singular
+    private List<? extends EventHandler<U, BE, S, ? extends BE>> eventHandlers;
 
-    private List<? extends StateQueryHandlers<U, Q, R, S, F>> stateQueryHandlersList;
+    @NonNull
+    @Singular
+    private List<? extends StateQueryHandlers<U, BQ, BR, S, F>> stateQueryHandlers;
 
+    @NonNull
     private F initialFSMState;
 }

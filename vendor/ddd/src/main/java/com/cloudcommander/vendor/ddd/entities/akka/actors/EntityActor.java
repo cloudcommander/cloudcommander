@@ -21,10 +21,10 @@ import com.cloudcommander.vendor.ddd.contexts.BoundedContextDefinition;
 import com.cloudcommander.vendor.ddd.entities.states.StateEnvelope;
 
 
-import java.util.Map;
+import java.util.List;
 
 
-public class EntityActor<U, C extends Command<U>, E extends com.cloudcommander.vendor.ddd.entities.events.Event<U>, Q extends Query<U>, R extends Result<U>, S extends com.cloudcommander.vendor.ddd.entities.states.State, F extends com.cloudcommander.vendor.ddd.entities.fsmstates.FSMState> extends AbstractPersistentActor{
+public class EntityActor<U, BC extends Command<U>, BE extends com.cloudcommander.vendor.ddd.entities.events.Event<U>, BQ extends Query<U>, BR extends Result<U>, S extends com.cloudcommander.vendor.ddd.entities.states.State, F extends com.cloudcommander.vendor.ddd.entities.fsmstates.FSMState> extends AbstractPersistentActor{
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
@@ -32,9 +32,9 @@ public class EntityActor<U, C extends Command<U>, E extends com.cloudcommander.v
 
     private final String persistenceId;
 
-    private EntityDefinition<U, C, E, Q, R, S, F> entityDefinition;
+    private EntityDefinition<U, BC, BE, BQ, BR, S, F> entityDefinition;
 
-    public EntityActor(EntityDefinition<U, C, E, Q, R, S, F> entityDefinition){
+    public EntityActor(EntityDefinition<U, BC, BE, BQ, BR, S, F> entityDefinition){
         this.entityDefinition = entityDefinition;
 
         persistenceId = createPersistenceId(entityDefinition);
@@ -42,10 +42,26 @@ public class EntityActor<U, C extends Command<U>, E extends com.cloudcommander.v
 
     protected void addEventHandlers(ReceiveBuilder receiveBuilder) {
         //Inner event
+        final Receive eventsReceive = createEventsReceive(entityDefinition.getEventHandlers());
+
+        //Event envelope
+        receiveBuilder.match(EventEnvelope.class, eventEnvelope -> {
+            F newFsmState = (F)eventEnvelope.getNewFSMState();
+            BE event = (BE)eventEnvelope.getEvent();
+
+            eventsReceive.onMessage().apply(event);
+
+            if(newFsmState != null){
+                stateEnvelope = stateEnvelope.withFsmState(newFsmState);
+                setFsmState(newFsmState);
+            }
+        });
+    }
+
+    protected <ES extends BE> Receive createEventsReceive(List<? extends EventHandler<U, ? extends BE, S, ES>> eventHandlers){
         final ReceiveBuilder eventsReceiveBuilder = ReceiveBuilder.create();
-        final Map<E, ? extends EventHandler<U, E, S>> eventHandlerMap = entityDefinition.getEventHandlerMap();
-        for(EventHandler<U, E, S> eventHandler: eventHandlerMap.values()){
-            Class<E> eventClass = eventHandler.getEventClass();
+        for(EventHandler<U, ? extends BE, S, ES> eventHandler: eventHandlers){
+            Class<ES> eventClass = eventHandler.getEventClass();
             eventsReceiveBuilder.match(eventClass, event -> {
                 final S state = stateEnvelope.getState();
                 final S newState = eventHandler.handle(event, state);
@@ -59,20 +75,7 @@ public class EntityActor<U, C extends Command<U>, E extends com.cloudcommander.v
             log.warning("Unhandled event {} in actor {}", message, getSelf().path());
         });
 
-        final Receive eventsReceive = eventsReceiveBuilder.build();
-
-        //Event envelope
-        receiveBuilder.match(EventEnvelope.class, eventEnvelope -> {
-            F newFsmState = (F)eventEnvelope.getNewFSMState();
-            E event = (E)eventEnvelope.getEvent();
-
-            eventsReceive.onMessage().apply(event);
-
-            if(newFsmState != null){
-                stateEnvelope = stateEnvelope.withFsmState(newFsmState);
-                setFsmState(newFsmState);
-            }
-        });
+        return eventsReceiveBuilder.build();
     }
 
     private String createPersistenceId(EntityDefinition entityDefinition){
@@ -120,23 +123,52 @@ public class EntityActor<U, C extends Command<U>, E extends com.cloudcommander.v
     protected Receive createReceive(F fsmState){
         final ReceiveBuilder receiveBuilder = ReceiveBuilder.create();
 
-        //Handle queries
-        for (StateQueryHandlers<U, Q, R, S, F> stateQueryHandlers : entityDefinition.getStateQueryHandlersList()) {
-            //TODO tello optimize
-            final F queryHandlersState = stateQueryHandlers.getFsmState();
-            if(fsmState.equals(queryHandlersState)){
-                for (QueryHandler<U, Q, R, S> queryHandler : stateQueryHandlers.getQueryHandlers()) {
-                    final Class<Q> queryClass = queryHandler.getQueryClass();
-                    receiveBuilder.match(queryClass, query -> {
-                        final S state = stateEnvelope.getState();
-                        final Result<U> queryResult = queryHandler.handle(query, state);
+        addStateQueryHandlers(fsmState, receiveBuilder, entityDefinition.getStateQueryHandlers());
 
-                        getSelf().tell(queryResult, getSender());
-                    });
-                }
+        addStateCommandHandlers(fsmState, receiveBuilder, entityDefinition.getStateCommandHandlers());
+
+        //Unhandled message
+        receiveBuilder.matchAny(message -> {
+            final UnhandledCommandResponse unhandledCommandResponse = new UnhandledCommandResponse(message.getClass());
+            getSender().tell(unhandledCommandResponse, getSelf());
+        });
+
+        return receiveBuilder.build();
+    }
+
+    protected void addStateQueryHandlers(F fsmState, final ReceiveBuilder receiveBuilder, List<? extends StateQueryHandlers<U, BQ, BR, S, F>> stateQueryHandlers){
+        for(StateQueryHandlers<U, BQ, BR, S, F> stateQueryHandler: stateQueryHandlers){
+            final F queryHandlersState = stateQueryHandler.getFsmState();
+            if(fsmState.equals(queryHandlersState)){
+                addQueryHandlers(receiveBuilder, stateQueryHandler.getQueryHandlers());
             }
         }
+    }
 
+    protected <QS extends BQ> void addQueryHandlers(final ReceiveBuilder receiveBuilder, final List<? extends QueryHandler<U, ? extends BQ, ? extends BR, S, QS>> queryHandlers){
+        for (QueryHandler<U, ? extends BQ, ? extends BR, S, QS> queryHandler : queryHandlers) {
+            final Class<QS> queryClass = queryHandler.getQueryClass();
+            receiveBuilder.match(queryClass, query -> {
+                final S state = stateEnvelope.getState();
+                final Result<U> queryResult = queryHandler.handle(query, state);
+
+                getSelf().tell(queryResult, getSender());
+            });
+        }
+    }
+
+    protected void addStateCommandHandlers(F fsmState, ReceiveBuilder receiveBuilder, List<? extends StateCommandHandlers<U, BC, BE, S, F>> stateCommandHandlersList) {
+        //Handle commands
+        for (StateCommandHandlers<U, BC, BE, S, F> stateCommandHandlers : stateCommandHandlersList) {
+            //TODO tello optimize
+            final F commandHandlersState = stateCommandHandlers.getFsmState();
+            if(fsmState.equals(commandHandlersState)){
+                addCommandHandlers(receiveBuilder, stateCommandHandlers.getCommandHandlers());
+            }
+        }
+    }
+
+    protected <C extends BC> void addCommandHandlers(ReceiveBuilder receiveBuilder, List<? extends CommandHandler<U, BC, BE, S, F, C>> commandHandlers) {
         //Events receive
         final ReceiveBuilder eventHandlersReceiveBuilder = ReceiveBuilder.create();
         addEventHandlers(eventHandlersReceiveBuilder);
@@ -147,35 +179,21 @@ public class EntityActor<U, C extends Command<U>, E extends com.cloudcommander.v
 
         final Receive eventHandlersReceive = eventHandlersReceiveBuilder.build();
 
-        //Handle commands
-        for (StateCommandHandlers<U, C, E, S, F> stateCommandHandlers : entityDefinition.getStateCommandHandlersList()) {
-            //TODO tello optimize
-            final F commandHandlersState = stateCommandHandlers.getFsmState();
-            if(fsmState.equals(commandHandlersState)){
-                for (CommandHandler<U, C, E, S, F> commandHandler : stateCommandHandlers.getCommandHandlers()) {
-                    final Class<C> commandClass = commandHandler.getCommandClass();
-                    receiveBuilder.match(commandClass, command -> {
-                        final S state = stateEnvelope.getState();
-                        final CommandHandler.CommandHandlerResult<E, F> commandHandlerResult = commandHandler.handle(command, state);
+        //Command handler
+        for (CommandHandler<U, ? extends BC, ? extends BE, S, F, C> commandHandler : commandHandlers) {
+            final Class<C> commandClass = commandHandler.getCommandClass();
+            receiveBuilder.match(commandClass, command -> {
+                final S state = stateEnvelope.getState();
+                final CommandHandler.CommandHandlerResult<? extends BE, F> commandHandlerResult = commandHandler.handle(command, state);
 
-                        final E event = commandHandlerResult.getEvent();
-                        final F newFsmState = commandHandlerResult.getNewFsmState();
+                final BE event = commandHandlerResult.getEvent();
+                final F newFsmState = commandHandlerResult.getNewFsmState();
 
-                        final EventEnvelope<U, E, F> eventEnvelope = new EventEnvelope<>(event, newFsmState);
-                        persist(eventEnvelope, persistedEvent -> {
-                            eventHandlersReceive.onMessage().apply(persistedEvent);
-                        });
-                    });
-                }
-            }
+                final EventEnvelope<U, BE, F> eventEnvelope = new EventEnvelope<>(event, newFsmState);
+                persist(eventEnvelope, persistedEvent -> {
+                    eventHandlersReceive.onMessage().apply(persistedEvent);
+                });
+            });
         }
-
-        //Unhandled message
-        receiveBuilder.matchAny(message -> {
-            final UnhandledCommandResponse unhandledCommandResponse = new UnhandledCommandResponse(message.getClass());
-            getSender().tell(unhandledCommandResponse, getSelf());
-        });
-
-        return receiveBuilder.build();
     }
 }

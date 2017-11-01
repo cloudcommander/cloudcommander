@@ -3,18 +3,22 @@ package com.cloudcommander.vendor.ddd.entities.queries;
 import com.cloudcommander.vendor.ddd.entities.fsmstates.FSMState;
 import com.cloudcommander.vendor.ddd.entities.results.Result;
 import com.cloudcommander.vendor.ddd.entities.states.State;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.*;
 
 import java.util.List;
 
 /**
  * Created by Adrian Tello on 18/10/2017.
  */
+@Builder
 @EqualsAndHashCode
 @Value
-public class StateQueryHandlers<U, Q extends Query<U>, R extends Result<U>, S extends State, F extends FSMState>{
+public class StateQueryHandlers<U, BQ extends Query<U>, BR extends Result<U>, S extends State, F extends FSMState>{
+
+    @NonNull
     private F fsmState;
 
-    private List<? extends QueryHandler<U, Q, R, S>> queryHandlers;
+    @NonNull
+    @Singular
+    private List<? extends QueryHandler<U, ? extends BQ, BR, S, ? extends BQ>> queryHandlers;
 }
