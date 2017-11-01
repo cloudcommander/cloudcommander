@@ -1,1 +1,16 @@
 language: java
+env:
+  global:
+   - secure: "zhnjyQINeOh4Au2pTuBBolvdyf3CQSrjL0qI1dEIHEnrSb/GHyyve5TpQp2L+mLmYERDRAAO3bp0gSxpELcx6i8QCWiacd6XjXonB8lQt+oAd94RRxQLz6nUS58BNM8Yk2ZxPVetuAd7o00jwTHLs1t6Fm2Iqrxxde3GWVHtyUTS4gSldlObF1piKZ/oDB3DItV5AR0KIv9UQ/4N2otdpJTPYQF68m+jYX1nn6lsltE8AEh5ck2ywcgArUiQ682NV1SCunoXYN+5turQUg6ooI41TVf81XFSRVEk2050V/ZPnWDjQrTEFo0wsATwesGzfhhpAxZrP66ep+wJvxzDxTU7bZPapmpFXsK/nkAtU4Cb30vcdvEIg4FH8gbJIeJ2fdarL7zdIYZve6rjZw96t0Mpbv+aKIW3XtVMsRwfCP5Wya2lLCRzmYegeTBJOHVBWvmSkB94BIXl80zMv591kB+m7fWyFa9J8Wa5V0O1svnT00orSbEdHBlHZt5NncZUdAm7/Xz2RDO3vmWe9eYgFGnQR85KVxG2HyogPcHl0f2N1vUkHBneFA9Yz+ziKW+c+v7dE57bXvInsvZtdl/DNpshcEQgOq2oG1VKRjtsorWhA1Sy791B93KzDFN+MKwfBlanDfwyaVoumnI7vY3YqhAYGIBfNRlZEVWyEjRDEFg="
+
+before_install:
+      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+  coverity_scan:
+    project:
+      name: "cloudcommander/cloudcommander"
+      description: "Build submitted via Travis CI"
+    build_command_prepend: "gradlew clean"
+    build_command:   "gradlew build -x test"
+    branch_pattern: "*"
