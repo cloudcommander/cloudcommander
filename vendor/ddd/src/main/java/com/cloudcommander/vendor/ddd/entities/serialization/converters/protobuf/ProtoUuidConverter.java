@@ -8,5 +8,5 @@ import java.util.UUID;
 /**
  * Created by Adrian Tello on 01/11/2017.
  */
-public interface ProtoUUIDConverter extends Converter<UUID, Uuid.UUID>{
+public interface ProtoUuidConverter extends Converter<UUID, Uuid.UUID>{
 }

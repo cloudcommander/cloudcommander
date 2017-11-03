@@ -13,9 +13,9 @@ import java.util.UUID;
  * Created by Adrian Tello on 01/11/2017.
  */
 @RunWith(JUnit4.class)
-public class DefaultProtoUUIDConverterUnitTest {
+public class DefaultProtoUuidConverterUnitTest {
 
-    private final ProtoUUIDConverter protoUuidConverter = new DefaultProtoUUIDConverter();
+    private final ProtoUuidConverter protoUuidConverter = new DefaultProtoUuidConverter();
 
     @Test
     public void testToSerializable(){

@@ -6,7 +6,7 @@ import com.cloudcommander.vendor.ddd.entities.Uuid;
 /**
  * Created by Adrian Tello on 01/11/2017.
  */
-public class DefaultProtoUUIDConverter implements ProtoUUIDConverter {
+public class DefaultProtoUuidConverter implements ProtoUuidConverter {
     @Override
     public UUID fromSerializable(Uuid.UUID uuid) {
         final long mostSigBits = uuid.getMostSigBits();
