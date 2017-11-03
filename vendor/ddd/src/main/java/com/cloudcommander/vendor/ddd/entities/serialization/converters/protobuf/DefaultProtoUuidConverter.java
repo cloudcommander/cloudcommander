@@ -8,20 +8,20 @@ import com.cloudcommander.vendor.ddd.entities.Uuid;
  */
 public class DefaultProtoUuidConverter implements ProtoUuidConverter {
     @Override
-    public UUID fromSerializable(Uuid.UUID uuid) {
-        final long mostSigBits = uuid.getMostSigBits();
-        final long leastSigBits = uuid.getLeastSigBits();
+    public UUID toDomain(Uuid.UUID dto) {
+        final long mostSigBits = dto.getMostSigBits();
+        final long leastSigBits = dto.getLeastSigBits();
 
         return new UUID(mostSigBits, leastSigBits);
     }
 
     @Override
-    public Uuid.UUID toSerializable(UUID uuid) {
-        final Uuid.UUID.Builder newUuidBuilder = Uuid.UUID.newBuilder();
+    public Uuid.UUID toDto(UUID uuid) {
+        final Uuid.UUID.Builder dtoBuilder = Uuid.UUID.newBuilder();
 
-        newUuidBuilder.setMostSigBits(uuid.getMostSignificantBits());
-        newUuidBuilder.setLeastSigBits(uuid.getLeastSignificantBits());
+        dtoBuilder.setMostSigBits(uuid.getMostSignificantBits());
+        dtoBuilder.setLeastSigBits(uuid.getLeastSignificantBits());
 
-        return newUuidBuilder.build();
+        return dtoBuilder.build();
     }
 }

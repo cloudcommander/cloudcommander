@@ -18,25 +18,25 @@ public class DefaultProtoUuidConverterUnitTest {
     private final ProtoUuidConverter protoUuidConverter = new DefaultProtoUuidConverter();
 
     @Test
-    public void testToSerializable(){
+    public void testToDto(){
         UUID originalUuid = UUID.randomUUID();
 
-        final Uuid.UUID convertedUuid = protoUuidConverter.toSerializable(originalUuid);
+        final Uuid.UUID dto = protoUuidConverter.toDto(originalUuid);
 
-        Assert.assertEquals(originalUuid.getLeastSignificantBits(), convertedUuid.getLeastSigBits());
-        Assert.assertEquals(originalUuid.getMostSignificantBits(), convertedUuid.getMostSigBits());
+        Assert.assertEquals(originalUuid.getLeastSignificantBits(), dto.getLeastSigBits());
+        Assert.assertEquals(originalUuid.getMostSignificantBits(), dto.getMostSigBits());
     }
 
     @Test
-    public void testFromSerializable(){
+    public void testToDomain(){
         UUID templateUuid = UUID.randomUUID();
 
-        final Uuid.UUID.Builder sourceUuidBuilder = Uuid.UUID.newBuilder();
-        sourceUuidBuilder.setMostSigBits(templateUuid.getMostSignificantBits());
-        sourceUuidBuilder.setLeastSigBits(templateUuid.getLeastSignificantBits());
-        final Uuid.UUID sourceUuid = sourceUuidBuilder.build();
+        final Uuid.UUID.Builder dtoBuilder = Uuid.UUID.newBuilder();
+        dtoBuilder.setMostSigBits(templateUuid.getMostSignificantBits());
+        dtoBuilder.setLeastSigBits(templateUuid.getLeastSignificantBits());
+        final Uuid.UUID dtoUuid = dtoBuilder.build();
 
-        UUID convertedUuid = protoUuidConverter.fromSerializable(sourceUuid);
+        final UUID convertedUuid = protoUuidConverter.toDomain(dtoUuid);
 
         Assert.assertEquals(templateUuid, convertedUuid);
     }
