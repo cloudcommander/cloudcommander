@@ -12,6 +12,7 @@ buildscript {
 
 apply plugin: 'com.cloudcommander.module'
 apply plugin: 'com.google.protobuf'
+apply plugin: 'idea'
 
 repositories {
     mavenCentral()
@@ -40,7 +41,20 @@ compileJava {
 }
 
 protobuf {
+    generatedFilesBaseDir = "$projectDir/build/generated/proto"
+
     protoc {
         artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/java");
     }
 }
