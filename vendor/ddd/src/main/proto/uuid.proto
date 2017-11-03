@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option java_package = "com.cloudcommander.vendor.ddd.entities";
+
+message UUID {
+     fixed64 leastSigBits = 1;
+     fixed64 mostSigBits = 2;
+}

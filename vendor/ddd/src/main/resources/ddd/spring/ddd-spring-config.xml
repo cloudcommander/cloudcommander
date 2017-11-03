@@ -27,4 +27,8 @@
             </bean>
         </constructor-arg>
     </bean>
+
+    <alias name="protoUUIDConverter" alias="uuidConverter"/>
+    <alias name="defaultProtoUUIDConverter" alias="protoUUIDConverter"/>
+    <bean id="defaultProtoUUIDConverter" class="com.cloudcommander.vendor.ddd.entities.serialization.converters.protobuf.DefaultProtoUUIDConverter"/>
 </beans>

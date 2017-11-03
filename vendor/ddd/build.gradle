@@ -1,7 +1,17 @@
 group 'com.cloudcommander.vendor.ddd'
 version '1.0-SNAPSHOT'
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
+    }
+}
+
 apply plugin: 'com.cloudcommander.module'
+apply plugin: 'com.google.protobuf'
 
 repositories {
     mavenCentral()
@@ -14,6 +24,7 @@ dependencies{
     compile group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.4'
     compile 'org.iq80.leveldb:leveldb:0.7'
     compile 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
+    compile 'com.google.protobuf:protobuf-java:3.0.0'
     compileOnly 'org.projectlombok:lombok:1.16.18'
 
     testCompile 'junit:junit:4.12'
@@ -26,4 +37,10 @@ dependencies{
 compileJava {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
 }
