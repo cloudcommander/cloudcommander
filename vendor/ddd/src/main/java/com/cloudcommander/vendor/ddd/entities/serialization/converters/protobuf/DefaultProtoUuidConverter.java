@@ -24,4 +24,14 @@ public class DefaultProtoUuidConverter implements ProtoUuidConverter {
 
         return dtoBuilder.build();
     }
+
+    @Override
+    public Class<UUID> getDomainClass() {
+        return UUID.class;
+    }
+
+    @Override
+    public Class<Uuid.UUID> getDtoClass() {
+        return Uuid.UUID.class;
+    }
 }

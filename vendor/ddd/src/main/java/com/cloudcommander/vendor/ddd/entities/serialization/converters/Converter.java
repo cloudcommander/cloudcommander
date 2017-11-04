@@ -7,4 +7,8 @@ public interface Converter<S, O> {
     S toDomain(O dto);
 
     O toDto(S object);
+
+    Class<S> getDomainClass();
+
+    Class<O> getDtoClass();
 }

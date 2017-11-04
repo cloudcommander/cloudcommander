@@ -32,6 +32,16 @@ public class DefaultProtoIncrementCommandConverter implements ProtoIncrementComm
         return dtoBuilder.build();
     }
 
+    @Override
+    public Class<IncrementCommand> getDomainClass() {
+        return IncrementCommand.class;
+    }
+
+    @Override
+    public Class<CounterActorCommands.IncrementCommand> getDtoClass() {
+        return CounterActorCommands.IncrementCommand.class;
+    }
+
     protected ProtoUuidConverter getProtoUuidConverter() {
         return protoUuidConverter;
     }
